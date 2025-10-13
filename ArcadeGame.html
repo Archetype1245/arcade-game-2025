@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Arcade Game</title>
+    <style>
+    body {
+        margin: 0;
+    }
+
+    canvas {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    </style>
+</head>
+<body>
+    <canvas id="canv"></canvas>
+    <!-- Engine -->
+    <script src="../../engine/Engine.js"></script>
+    <script src="../../engine/AnimationManager.js"></script>
+    <script src="../../engine/Vector2.js"></script>
+    <script src="../../engine/Scene.js"></script>
+    <script src="../../engine/SceneManager.js"></script>
+    <script src="../../engine/GameObject.js"></script>
+    <script src="../../engine/Component.js"></script>
+    <script src="../../engine/Input.js"></script>
+    <script src="../../engine/Time.js"></script>
+    <script src="../../engine/Collisions.js"></script>
+    <script src="../../engine/Mat2D.js"></script>
+    <script src="../../engine/MathUtils.js"></script>
+
+    <script src="../../engine/components/Transform.js"></script>
+    <script src="../../engine/components/Camera.js"></script>
+    <script src="../../engine/components/Collider.js"></script>
+    <script src="../../engine/components/RigidBody.js"></script>
+    <script src="../../engine/components/Polygon.js"></script>
+    <script src="../../engine/components/PolygonCollider.js"></script>
+    <script src="../../engine/components/Circle.js"></script>
+
+    <!-- Game -->
+    <script src="./game/utils/Config.js"></script>
+
+    <script src="./game/scenes/GameScene.js"></script>
+    <script src="./game/prefabs/PlayableAreaGameObject.js"></script>
+    <script src="./game/prefabs/PlayerGameObject.js"></script>
+    <script src="./game/prefabs/CameraGameObject.js"></script>
+    <script src="./game/prefabs/LaserGameObject.js"></script>
+    <script src="./game/prefabs/EnemyGameObject.js"></script>
+    <script src="./game/prefabs/DebugGameObject.js"></script>
+
+    <script src="./game/components/PlayerController.js"></script>
+    <script src="./game/components/FollowTargetController.js"></script>
+    <script src="./game/components/LaserController.js"></script>
+    <script src="./game/components/DebugController.js"></script>
+
+    <script src="./game/components/Enemies/PurpleEnemyController.js"></script>
+    <script src="./game/components/Enemies/BlueEnemyController.js"></script>
+    <script src="./game/components/Enemies/GreenEnemyController.js"></script>
+    <script src="./game/components/Enemies/PinkEnemyController.js"></script>
+    
+    <script>
+        Engine.currentScene = SceneManager.addScene(new GameScene())
+        requestAnimationFrame(Engine.start)
+    </script>
+</body>
+
+</html>
