@@ -4,6 +4,7 @@ class GreenEnemyController extends Component {
         this.gameObject.addComponent(new Collider())
         this.player = GameObject.getObjectByName("PlayerGameObject")
         this.rotationSpeed = 0.5
+        this.speed = 350
 
         this.outer = {
             tL: new Vector2(-3, -3),
@@ -61,17 +62,6 @@ class GreenEnemyController extends Component {
             strokeStyle: Config.colors.greenUpperLines,
             lineWidth: 2
         })
-        // this.upperLines = this.gameObject.addComponent(new Polygon(), {
-        //     points: [
-        //         [this.inner.tL, this.inner.tM, this.inner.tR],
-        //         [this.inner.bL, this.inner.tM, this.inner.tL],
-        //         [this.inner.bL, this.inner.tM, this.inner.bR],
-        //         [this.inner.bR, this.inner.tM, this.inner.tR],
-        //     ],
-        //     fillStyle: Config.colors.greenHi,
-        //     strokeStyle: Config.colors.greenUpperLines,
-        //     lineWidth: 2
-        // })
 
         this.lowerLines = this.gameObject.addComponent(new Polygon(), {
             points: [
@@ -86,16 +76,11 @@ class GreenEnemyController extends Component {
         })
 
         this.polys = [this.outerTris, this.upperLeftLines, this.upperRightLines, this.lowerLines]
-        // this.transform.rotate(Math.PI / 2)
     }
 
     update() {
         // Apply a static rotation to the polygon points
         this.transform.rotate(this.rotationSpeed * Math.PI * Time.deltaTime)
-        let { x, y } = this.transform.position 
-
-        const p = new Vector2(this.player.transform.position)
-
 
         // I want the object to appear to rotate around the middle axis, but the object is faux-3D,
         // so the "midpoints" are just offset from the actual local origin.
@@ -108,8 +93,12 @@ class GreenEnemyController extends Component {
         this.inner.tM.setVec(unrotatedTM.x, unrotatedTM.y)
         this.inner.bM.setVec(unrotatedBM.x, unrotatedBM.y)
 
-        // Shift which of the upper polygons are lit
+        // let t = this.transform.position
+        // const p = this.player.transform.position
+        // const dir = p.getDirectionVector(t)
 
+        // const newPos = t.plusEquals(dir.times(this.speed * Time.deltaTime))
+        // this.transform.position = newPos
 
         this.polys.forEach(p => p.markDirty())
     }

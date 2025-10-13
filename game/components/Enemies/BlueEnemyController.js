@@ -2,6 +2,8 @@ class BlueEnemyController extends Component {
     start() {
         this.transform.setUniformScale(10)
         this.gameObject.addComponent(new Collider())
+        this.player = GameObject.getObjectByName("PlayerGameObject")
+        this.speed = 350
         this.amp = 0.18
         this.period = 2.5
         this.t0 = Time.time
@@ -85,12 +87,12 @@ class BlueEnemyController extends Component {
         })
 
         this.polys = [this.topFrontPoly, this.topLeftPoly, this.topRightPoly, this.topBackPoly,
-                      this.bottomFrontPoly, this.bottomLeftPoly, this.bottomRightPoly, this.bottomBackPoly]
+        this.bottomFrontPoly, this.bottomLeftPoly, this.bottomRightPoly, this.bottomBackPoly]
     }
 
     update() {
         // Sinusoidal function to cycle between +- amplitude. Subtracting t0 to make an individual GO's cycle start on spawn and not be global
-        const s = this.amp * Math.sin((2*Math.PI/this.period) * (Time.time - this.t0))
+        const s = this.amp * Math.sin((2 * Math.PI / this.period) * (Time.time - this.t0))
         const su = 1 + s
         const sv = 1 / su
 
@@ -99,9 +101,17 @@ class BlueEnemyController extends Component {
             // Scale the dot products we calculated earlier by the u/v scale factors - this scales our total magnitude for the u/v axes.
             // Then use these values to scale the u/v basis vectors - this gives the scaled u/v component vectors
             // Finally, adding these component vectors to the centroid gives the properly scaled position of the point
-            const p = this.c.plus(this.u.times(a*su)).plus(this.v.times(b*sv))
+            const p = this.c.plus(this.u.times(a * su)).plus(this.v.times(b * sv))
             this.defs[k].setVec(p.x, p.y)         // Mutating the values directly, so the Polygon components see the updates immediately
         }
+
+        // let t = this.transform.position
+        // const p = this.player.transform.position
+        // const dir = p.getDirectionVector(t)
+
+        // const newPos = t.plusEquals(dir.times(this.speed * Time.deltaTime))
+        // this.transform.position = newPos
+
         this.polys.forEach(p => p.markDirty())
     }
 }

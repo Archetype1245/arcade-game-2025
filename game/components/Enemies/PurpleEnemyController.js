@@ -1,6 +1,9 @@
 class PurpleEnemyController extends Component {
     start() {
         this.transform.setUniformScale(24)
+        this.speed = 200
+        const a = Math.random()*2*Math.PI
+        this.dir = (new Vector2(Math.cos(a), Math.sin(a))).normalize()
         this.rotationSpeed = -1.25
 
         this.gameObject.addComponent(new Collider())
@@ -21,7 +24,11 @@ class PurpleEnemyController extends Component {
     }
 
     update() {
+        let t = this.transform.position
+
+
         this.transform.rotate(this.rotationSpeed * Math.PI * Time.deltaTime)
+        
         this.poly.markDirty()
     }
 }
