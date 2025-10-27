@@ -1,6 +1,6 @@
 class DebugController extends Component {
     start() {
-        this.scene = Engine.currentScene
+        this.scene = SceneManager.currentScene
         this.cam = GameObject.getObjectByName("CameraGameObject").getComponent(Camera2D)
     }
 
@@ -55,7 +55,7 @@ class DebugController extends Component {
         })
 
         GameObject.instantiate(new EnemyGameObject(enemyType), {
-            scene: Engine.currentScene,
+            scene: SceneManager.currentScene,
             layer: Config.layers.enemies,
             position: pos
         })

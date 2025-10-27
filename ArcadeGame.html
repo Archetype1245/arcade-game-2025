@@ -27,6 +27,7 @@
     <script src="../../engine/Scene.js"></script>
     <script src="../../engine/SceneManager.js"></script>
     <script src="../../engine/GameObject.js"></script>
+    <script src="../../engine/CameraGameObject.js"></script>
     <script src="../../engine/Component.js"></script>
     <script src="../../engine/Input.js"></script>
     <script src="../../engine/Time.js"></script>
@@ -35,7 +36,7 @@
     <script src="../../engine/MathUtils.js"></script>
 
     <script src="../../engine/components/Transform.js"></script>
-    <script src="../../engine/components/Camera.js"></script>
+    <script src="../../engine/components/Camera2D.js"></script>
     <script src="../../engine/components/Collider.js"></script>
     <script src="../../engine/components/RigidBody.js"></script>
     <script src="../../engine/components/Polygon.js"></script>
@@ -52,7 +53,6 @@
     <script src="./game/scenes/GameScene.js"></script>
     <script src="./game/prefabs/PlayableAreaGameObject.js"></script>
     <script src="./game/prefabs/PlayerGameObject.js"></script>
-    <script src="./game/prefabs/CameraGameObject.js"></script>
     <script src="./game/prefabs/LaserGameObject.js"></script>
     <script src="./game/prefabs/EnemyGameObject.js"></script>
     <script src="./game/prefabs/LightBeamGameObject.js"></script>
@@ -71,7 +71,7 @@
 
     <script>
 
-        Engine.currentScene = SceneManager.addScene(new GameScene())
+        SceneManager.loadScene(new GameScene())
         requestAnimationFrame(Engine.start)
     </script>
 </body>

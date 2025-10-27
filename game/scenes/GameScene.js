@@ -8,7 +8,7 @@ class GameScene extends Scene {
         const cy = Config.playable.h / 2
 
         const player = GameObject.instantiate(new PlayerGameObject(), { scene: this, position: new Vector2(cx, cy), layer: Config.layers.player })
-        const cam = GameObject.instantiate(new CameraGameObject(), { scene: this })
+        const cam = GameObject.findObjectByName("CameraGameObject")
         GameObject.instantiate(new PlayableAreaGameObject(), { scene: this })
         GameObject.instantiate(new DebugGameObject(), { scene: this, layer: Config.layers.debug })
 
