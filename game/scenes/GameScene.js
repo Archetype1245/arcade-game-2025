@@ -13,5 +13,9 @@ class GameScene extends Scene {
         GameObject.instantiate(new DebugGameObject(), { scene: this, layer: Config.layers.debug })
 
         this.activeCamera = cam.getComponent(Camera2D)
+        this.enemies = new Map()
+        this.cellData = new CellMap()
+
+        this._sinBlue = (2*Math.PI/2.5) * Time.deltaTime
     }
 }

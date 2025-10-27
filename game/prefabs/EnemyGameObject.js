@@ -1,6 +1,12 @@
 class EnemyGameObject extends GameObject {
     constructor(enemyType) {
         super("EnemyGameObject")
+        this.type = Config.objectType.enemy
+        this.subType = enemyType
+        this.cellData = Engine.currentScene.cellData
+        this.cellData.insert(this)
+
+        this.collider = this.addComponent(new PolygonCollider())
 
         switch (enemyType) {
             case Config.enemyTypes.purple:

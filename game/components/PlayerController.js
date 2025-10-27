@@ -5,10 +5,11 @@ class PlayerController extends Component {
         this.framesSinceFired = Infinity
         this.fireRate = 5
         this.radius = 20
-        this.bounds = { x1: Config.playable.x1 + this.radius,
-                        x2: Config.playable.x2 - this.radius,
-                        y1: Config.playable.y1 + this.radius,
-                        y2: Config.playable.y2 - this.radius,
+        this.bounds = {
+            x1: Config.playable.x1 + this.radius,
+            x2: Config.playable.x2 - this.radius,
+            y1: Config.playable.y1 + this.radius,
+            y2: Config.playable.y2 - this.radius,
         }
     }
 
@@ -36,7 +37,7 @@ class PlayerController extends Component {
             // Ensure player stays within bounds. Only update transform once.
             const nx = MathUtils.clamp(x, this.bounds.x1, this.bounds.x2)
             const ny = MathUtils.clamp(y, this.bounds.y1, this.bounds.y2)
-            this.transform.position = { x: nx, y: ny }
+            this.transform.position = new Vector2(nx, ny)
         }
     }
 
@@ -48,17 +49,17 @@ class PlayerController extends Component {
 
             const angle = Math.atan2(wp.y - y, wp.x - x)
             const f = new Vector2(wp.x - x, wp.y - y).normalize()
-            const orth = new Vector2(-f.y, f.x)
-            
+            const orth = f.orthogonal()
+
             // Will almost certainly revisit this when dealing with power-ups that affect shooting
             const forwardOffset = 5
             const sideOffset = 10
 
-            const leftBarrel = new Vector2(x + f.x*forwardOffset - orth.x*sideOffset,
-                                           y + f.y*forwardOffset - orth.y*sideOffset
+            const leftBarrel = new Vector2(x + f.x * forwardOffset - orth.x * sideOffset,
+                y + f.y * forwardOffset - orth.y * sideOffset
             )
-            const rightBarrel = new Vector2(x + f.x*forwardOffset + orth.x*sideOffset,
-                                            y + f.y*forwardOffset + orth.y*sideOffset 
+            const rightBarrel = new Vector2(x + f.x * forwardOffset + orth.x * sideOffset,
+                y + f.y * forwardOffset + orth.y * sideOffset
             )
 
             GameObject.instantiate(new LaserGameObject(angle), { position: leftBarrel, layer: Config.layers.effects })

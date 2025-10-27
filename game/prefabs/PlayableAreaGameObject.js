@@ -14,7 +14,7 @@ class PlayableAreaGameObject extends GameObject {
              new Vector2( w/2,  h/2),
              new Vector2(-w/2,  h/2)]
         
-        this.addComponent(new PolygonCollider(), {
+        this.addComponent(new Polygon(), {
             points: points,
             fill: true,
             fillStyle: Config.colors.background,

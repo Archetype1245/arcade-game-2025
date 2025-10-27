@@ -5,30 +5,42 @@ class Config {
         zoom: 1
     }
 
-    static lighting = {
-        background: "#00102aff",
-        lightDirection: { x: -2, y: -3},
-        lightStrength: 0.2,
-        shadowStrength: 0.2,
-        highlightColor: "#fff",
-        shadowColor: "#000"
-    }
     static playable = { x1: 0, y1: 0, x2: 1800, y2: 1200, w: 1800, h: 1200 }
+
     static speed = {
-        player: 500
+        player: 500,
+        bullets: 1400,
+        purpleEnemy: 200,
+        blueEnemy: 275,
+        greenEnemy: 350,
+        pinkEnemy: 400
     }
+    
+    static objectType = {
+        player: 1<<0,
+        bullet: 1<<1,
+        enemy:  1<<2
+    }
+    
+    static enemyTypes = {
+        purple: 1<<0,
+        blue:   1<<1,
+        green:  1<<2,
+        pink:   1<<3
+    }
+
     static colors = {
         background: "#00102aff",
         red: "rgba(167, 0, 0, 1)",
-        pinkBase: "rgba(252, 148, 184, .8)",
-        pinkHi: "rgba(255, 173, 203, .8)",
-        pinkLow: "rgba(255, 127, 165, .8)",
+        pinkBase: "rgba(252, 148, 184, .7)",
+        pinkHi: "rgba(255, 173, 203, .7)",
+        pinkLow: "rgba(255, 127, 165, .7)",
         pinkUpperLines: "rgba(250, 237, 248, 1)",
-        pinkBottomLines: "rgba(250, 126, 231, 0.6)",
-        lightblueLinesFront: "rgba(106, 244, 252, 0.6)",
-        lightblueLinesBack: "rgba(73, 246, 255, .2)",
-        lightblueLow: "rgba(10, 30, 40, .7)",
-        lightblueM: "rgba(15, 89, 118, .7)",
+        pinkBottomLines: "rgba(254, 146, 240, 0.7)",
+        lightblueLinesFront: "rgba(106, 244, 252, 0.8)",
+        lightblueLinesBack: "rgba(66, 221, 230, 0.4)",
+        lightblueLow: "rgba(15, 44, 59, 0.7)",
+        lightblueM: "rgba(19, 109, 145, 0.7)",
         lightblueT: "rgba(73, 246, 255, .1)",
         lightblueHi: "rgba(157, 253, 253, 0.7)",
         greenHi: "rgba(83, 227, 148, 0.5)",
@@ -38,22 +50,25 @@ class Config {
         greenBottomLines: "rgba(61, 176, 61, 0.6)",
         blue: "rgba(3, 13, 200, 1)",
         purpleLine: "rgba(229, 181, 255, 1)",
-        purpleFill: "rgba(140, 39, 254, 1)",
+        purpleFill: "rgba(140, 39, 254, .8 )",
         player: "rgba(174, 248, 253, 1)"
     }
 
-    static enemyTypes = {
-        purple: "purple",
-        blue: "blue",
-        pink: "pink",
-        green: "green"
+    static beamColors = {
+        purpleBeam: { r: 140, g: 100, b: 255 },
+        lightBlueBeam: { r: 80, g: 200, b: 240 },
+        greenBeam: { r: 40, g: 250, b: 100 },
+        pinkBeam: { r: 255, g: 170, b: 220 },
     }
-    static animations = {
-        totalNodeRotations: 3,
-        // Times in ms
-        fallSpeed: 1.75,
-        fallDelay: 80,
-        rotation: 150
+    
+    static lighting = {
+        background: "#00102aff",
+        // Unused now
+        lightDirection: { x: -2, y: -3},
+        lightStrength: 0.2,
+        shadowStrength: 0.2,
+        highlightColor: "#fff",
+        shadowColor: "#000"
     }
 
     static layers = {

@@ -1,37 +1,34 @@
 class GreenEnemyController extends Component {
     start() {
-        this.transform.setUniformScale(10)
-        this.gameObject.addComponent(new Collider())
+        this.cellData = SceneManager.getActiveScene().cellData
         this.player = GameObject.getObjectByName("PlayerGameObject")
+
+        this.size = 30
+        this.radius = Math.hypot(this.size, this.size)
+        this.transform.setScale(this.size)
+
         this.rotationSpeed = 0.5
-        this.speed = 350
+        this.speed = Config.speed.greenEnemy
 
         this.outer = {
-            tL: new Vector2(-3, -3),
-            bL: new Vector2(-3, 3),
-            bR: new Vector2(3, 3),
-            tR: new Vector2(3, -3)
+            tL: new Vector2(-1, -1), tR: new Vector2(1, -1),
+            bL: new Vector2(-1, 1), bR: new Vector2(1, 1),
         }
 
         this.inner = {
-            tL: new Vector2(-2, -2),
-            bL: new Vector2(-2, 2),
-            bR: new Vector2(2, 2),
-            tR: new Vector2(2, -2),
-            tM: new Vector2(-0.1, -0.5),
-            bM: new Vector2(0.1, 0.5)
+            tM: new Vector2(-0.04, -0.14),
+            tL: new Vector2(-0.6, -0.6), tR: new Vector2(0.6, -0.6),
+            bL: new Vector2(-0.6, 0.6), bR: new Vector2(0.6, 0.6),
+            bM: new Vector2(0.04, 0.14)
         }
         // Defined these to have a default base for the midpoints that never gets modified
         this.midOffsets = {
-            tM: new Vector2(-0.1, -0.5),
-            bM: new Vector2(0.1, 0.5)
+            tM: new Vector2(-0.04, -0.14),
+            bM: new Vector2(0.04, 0.14)
         }
 
-        // Hidden (rough) outline poly to handle collision checks
-        this.gameObject.addComponent(new PolygonCollider(), {
-            points: [this.outer.tL, this.outer.bL, this.outer.bR, this.outer.tR],
-            hidden: true
-        })
+        // Build polygons/paths/collision
+        this.gameObject.collider.points = [this.outer.tL, this.outer.bL, this.outer.bR, this.outer.tR]
 
         this.outerTris = this.gameObject.addComponent(new Polygon(), {
             points: [
@@ -40,42 +37,47 @@ class GreenEnemyController extends Component {
                 [this.outer.bR, this.inner.bR, this.inner.tR],
                 [this.outer.tR, this.inner.tR, this.inner.tL]
             ],
-            fillStyle: Config.colors.greenBase,
-            strokeStyle: Config.colors.greenUpperLines,
-            lineWidth: 2
+            fillStyle: Config.colors.greenBase
         })
-        this.upperLeftLines = this.gameObject.addComponent(new Polygon(), {
+        this.upperLeft = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.inner.tL, this.inner.tM, this.inner.tR],
                 [this.inner.bL, this.inner.tM, this.inner.tL],
             ],
-            fillStyle: Config.colors.greenHi,
-            strokeStyle: Config.colors.greenUpperLines,
-            lineWidth: 2
+            fillStyle: Config.colors.greenHi
         })
-        this.upperRightLines = this.gameObject.addComponent(new Polygon(), {
+        this.upperRight = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.inner.bL, this.inner.tM, this.inner.bR],
                 [this.inner.bR, this.inner.tM, this.inner.tR],
             ],
-            fillStyle: Config.colors.greenLow,
-            strokeStyle: Config.colors.greenUpperLines,
-            lineWidth: 2
+            fillStyle: Config.colors.greenLow
         })
-
+        this.upperLines = this.gameObject.addComponent(new Polygon(), {
+            points: [
+                [this.outer.tL, this.inner.bL, this.outer.bL, this.inner.bR,
+                 this.outer.bR, this.inner.tR, this.outer.tR, this.inner.tL,
+                 this.inner.bL, this.inner.bR, this.inner.tR, this.inner.tL],
+                [this.inner.tL, this.inner.tM, this.inner.bR],
+                [this.inner.bL, this.inner.tM, this.inner.tR]
+            ],
+            strokeStyle: Config.colors.greenUpperLines,
+            fill: false,
+            closePath: false,
+            lineWidth: 1
+        })
         this.lowerLines = this.gameObject.addComponent(new Polygon(), {
             points: [
-                [this.inner.tL, this.inner.bM],
-                [this.inner.bL, this.inner.bM],
-                [this.inner.bR, this.inner.bM],
-                [this.inner.tR, this.inner.bM],
+                [this.inner.tL, this.inner.bM, this.inner.bR],
+                [this.inner.bL, this.inner.bM, this.inner.tR]
             ],
-            fill: false,
             strokeStyle: Config.colors.greenBottomLines,
-            lineWidth: 2
+            fill: false,
+            closePath: false,
+            lineWidth: 1
         })
 
-        this.polys = [this.outerTris, this.upperLeftLines, this.upperRightLines, this.lowerLines]
+        this.polys = [this.gameObject.collider, this.outerTris, this.upperLeft, this.upperRight, this.upperLines, this.lowerLines]
     }
 
     update() {
@@ -93,13 +95,22 @@ class GreenEnemyController extends Component {
         this.inner.tM.setVec(unrotatedTM.x, unrotatedTM.y)
         this.inner.bM.setVec(unrotatedBM.x, unrotatedBM.y)
 
-        // let t = this.transform.position
-        // const p = this.player.transform.position
-        // const dir = p.getDirectionVector(t)
-
-        // const newPos = t.plusEquals(dir.times(this.speed * Time.deltaTime))
-        // this.transform.position = newPos
+        // Chases player
+        let t = this.transform.position
+        const p = this.player.transform.position
+        const dir = p.getDirectionVector(t)
+        t.plusEquals(dir.times(this.speed * Time.deltaTime))
+        // Stay in bounds
+        if (t.x < Config.playable.x1 + this.radius) t.x = this.radius
+        if (t.x > Config.playable.x2 - this.radius) t.x = Config.playable.x2 - this.radius
+        if (t.y < Config.playable.y1 + this.radius) t.y = this.radius
+        if (t.y > Config.playable.y2 - this.radius) t.y = Config.playable.y2 - this.radius
+        this.transform.position = t
 
         this.polys.forEach(p => p.markDirty())
+    }
+
+    onDestroy() {
+        this.cellData.remove(this)
     }
 }

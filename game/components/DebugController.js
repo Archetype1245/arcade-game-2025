@@ -18,13 +18,47 @@ class DebugController extends Component {
             }
 
             if (enemyType) {
-                GameObject.instantiate(new EnemyGameObject(enemyType), {
-                    scene: this.scene,
-                    layer: Config.layers.enemies,
-                    position: this.cam.screenPointToWorld(new Vector2(Input.mouseX, Input.mouseY))
-                })
+                for (let i = 0; i < 1; i++) {
+                    this.spawnEnemyDebug(enemyType)
+                }
             }
         }
+    }
+
+
+    async spawnEnemyDebug(enemyType) {
+        const pos = this.cam.screenPointToWorld(new Vector2(Input.mouseX, Input.mouseY))
+        const player = GameObject.getObjectByName("PlayerGameObject")
+        let color
+
+        switch (enemyType) {
+            case Config.enemyTypes.purple:
+                color = Config.beamColors.purpleBeam
+                break
+            case Config.enemyTypes.blue:
+                color = Config.beamColors.lightBlueBeam
+                break
+            case Config.enemyTypes.pink:
+                color = Config.beamColors.pinkBeam
+                break
+            case Config.enemyTypes.green:
+                color = Config.beamColors.greenBeam
+                break
+        }
+
+        await LightBeam.play(pos, {
+            color: color,
+            duration: 1.2,
+            width: 40,
+            playerName: "PlayerGameObject",
+            length: Math.hypot(Engine.canvas.width, Engine.canvas.height)
+        })
+
+        GameObject.instantiate(new EnemyGameObject(enemyType), {
+            scene: Engine.currentScene,
+            layer: Config.layers.enemies,
+            position: pos
+        })
     }
 
     draw(ctx) {
