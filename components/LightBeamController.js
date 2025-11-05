@@ -16,7 +16,6 @@ class LightBeam extends Component {
 
     maxAlpha = 0.85,
     length = 0,
-    started = false,
     onComplete = null,
   } = {}) {
 
@@ -29,6 +28,8 @@ class LightBeam extends Component {
     })
 
     this._L = Math.max(1, length || Math.hypot(Engine.canvas.width, Engine.canvas.height))
+    this.player = GameObject.getObjectByName("PlayerGameObject")
+    this.started = false
   }
 
   start() {
@@ -69,10 +70,11 @@ class LightBeam extends Component {
   }
 
   _retarget() {
-    const player = GameObject.getObjectByName("PlayerGameObject")
-    if (!player) return
+    this.player ??= GameObject.getObjectByName("PlayerGameObject")
+    if (!this.player) return
+    
 
-    const pW = player.transform.worldPosition
+    const pW = this.player.transform.worldPosition
     const bW = this.transform.worldPosition
     const dir = bW.getDirectionVector(pW)
     // Draw beam in the opposite direction of the player GO - just setting the rotation to match the angle
@@ -86,12 +88,12 @@ class LightBeam extends Component {
     const L = this._L
     const halfW = this.width * 0.5
 
-    const bctx = Engine.bctx
-    Engine.bufferCanvas.width = L
-    Engine.bufferCanvas.height = this.width
+    const ctxOS = Engine.ctxOS
+    Engine.offscreenCanvas.width = L
+    Engine.offscreenCanvas.height = this.width
 
     // Circular glow at base
-    ctx.save();
+    ctx.save()
     const R = this.baseGlowRadius
     const baseGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, R)
     baseGrad.addColorStop(0.00, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 0.40))
@@ -105,21 +107,21 @@ class LightBeam extends Component {
     ctx.arc(0, 0, R, 0, 2 * Math.PI)
     ctx.fill()
 
-    // Create the beam on the buffer canvas to easily mix multiple alpha gradients without affecting the main canvas
+    // Create the beam on the offscreen canvas to easily mix multiple alpha gradients without affecting the main canvas
     // Beam color gradients
-    bctx.save()
-    bctx.globalAlpha = this.alpha;
+    ctxOS.save()
+    ctxOS.globalAlpha = this.alpha;
 
-    const xGrad = bctx.createLinearGradient(0, 0, L, 0)
+    const xGrad = ctxOS.createLinearGradient(0, 0, L, 0)
     xGrad.addColorStop(0.00, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 0))
     xGrad.addColorStop(0.40, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 1))
 
-    const spikeGrad = bctx.createLinearGradient(0, 0, L, 0)
+    const spikeGrad = ctxOS.createLinearGradient(0, 0, L, 0)
     spikeGrad.addColorStop(0.00, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 0))
     spikeGrad.addColorStop(0.15, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 1))
 
-    bctx.fillStyle = p < this.pulseEnd ? xGrad : spikeGrad
-    bctx.fillRect(0, 0, L, this.width)
+    ctxOS.fillStyle = p < this.pulseEnd ? xGrad : spikeGrad
+    ctxOS.fillRect(0, 0, L, this.width)
 
     // Pulse
     if (p > this.pulseStart && p < this.pulseEnd) {
@@ -129,18 +131,18 @@ class LightBeam extends Component {
       const right = Math.min(left + w, L)
       const win = right - left
 
-      const pulseGrad = bctx.createLinearGradient(left, 0, right, 0)
+      const pulseGrad = ctxOS.createLinearGradient(left, 0, right, 0)
       pulseGrad.addColorStop(0.00, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 0))
       pulseGrad.addColorStop(0.50, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 1))
       pulseGrad.addColorStop(1.00, this.rgba({r:this.color.r, g:this.color.g, b:this.color.b}, 0))
 
-      bctx.globalAlpha = this.pulseAlpha
-      bctx.fillStyle = this.color
-      bctx.fillRect(left, 0, win, this.width)
+      ctxOS.globalAlpha = this.pulseAlpha
+      ctxOS.fillStyle = this.color
+      ctxOS.fillRect(left, 0, win, this.width)
     }
 
     if (p > this.pulseEnd) {
-      this.drawWhiteCore(bctx, L, this.width, {
+      this.drawWhiteCore(ctxOS, L, this.width, {
         base: 0.8*this.width,
         len: 0.2*L,
         k: 16
@@ -148,31 +150,67 @@ class LightBeam extends Component {
     }
 
     // Alpha Gradient/Mask
-    bctx.globalCompositeOperation = "destination-in"       // per-pixel: destination color * source alpha
-    bctx.globalAlpha = 1
+    ctxOS.globalCompositeOperation = "destination-in"       // per-pixel: destination color * source alpha
+    ctxOS.globalAlpha = 1
 
-    const yAlphaMask = bctx.createLinearGradient(0, 0, 0, this.width)
+    const yAlphaMask = ctxOS.createLinearGradient(0, 0, 0, this.width)
     yAlphaMask.addColorStop(0.00, "rgba(0,0,0,0)")
     yAlphaMask.addColorStop(0.50, "rgba(0,0,0,0.5)")
     yAlphaMask.addColorStop(1.00, "rgba(0,0,0,0)")
 
-    const yAlphaMaskSpike = bctx.createLinearGradient(0, 0, 0, this.width)
+    const yAlphaMaskSpike = ctxOS.createLinearGradient(0, 0, 0, this.width)
     yAlphaMaskSpike.addColorStop(0.00, "rgba(0,0,0,0)")
     yAlphaMaskSpike.addColorStop(0.30, "rgba(0,0,0,0)")
     yAlphaMaskSpike.addColorStop(0.50, "rgba(0,0,0,1)")
     yAlphaMaskSpike.addColorStop(0.70, "rgba(0,0,0,0)")
     yAlphaMaskSpike.addColorStop(1.00, "rgba(0,0,0,0)")
 
-    bctx.fillStyle = p < this.pulseEnd ? yAlphaMask : yAlphaMaskSpike
-    bctx.fillRect(0, 0, L, this.width)
-    bctx.restore()
+    ctxOS.fillStyle = p < this.pulseEnd ? yAlphaMask : yAlphaMaskSpike
+    ctxOS.fillRect(0, 0, L, this.width)
+    ctxOS.restore()
 
 
     ctx.shadowColor = this.color
     ctx.shadowBlur = this.beamGlow
     ctx.globalAlpha = 1
-    ctx.drawImage(Engine.bufferCanvas, 0, -halfW)     // Draw the beam on the main canvas
+    ctx.drawImage(Engine.offscreenCanvas, 0, -halfW)     // Draw the beam on the main canvas
     ctx.restore()
+  }
+  
+  rgba({r,g,b}, a) {
+    return `rgba(${r},${g},${b},${a})`
+  }
+  
+  drawWhiteCore(ctxOS, W, H, {
+    base = 0.75*H,
+    len  = 0.28*W,
+    k    = 14,    
+  } = {}) {
+    const cy = H/2, L = Math.max(1, Math.round(len))
+    const samples = 80
+    
+    const half = x => (base*0.5) / (1 + k * (x/L) * (x/L))
+    
+    const path = new Path2D()
+    path.moveTo(0, cy - half(0))
+    for (let i=1;i<=samples;i++){
+      const x = (i/samples)*L
+      path.lineTo(x, cy - half(x))
+    }
+    for (let i=samples;i>=0;i--){
+      const x = (i/samples)*L
+      path.lineTo(x, cy + half(x))
+    }
+    path.closePath()
+    
+    const g = ctxOS.createLinearGradient(0,0,L,0)
+    g.addColorStop(0.00, `rgba(255,255,255,1)`)
+    g.addColorStop(1.00, `rgba(255,255,255,0)`)
+    
+    ctxOS.save()
+    ctxOS.fillStyle = g
+    ctxOS.fill(path)
+    ctxOS.restore()
   }
 
 
@@ -190,41 +228,5 @@ class LightBeam extends Component {
       })
       go.addComponent(new LightBeam({ ...opts, onComplete: resolve }))
     })
-  }
-
-  rgba({r,g,b}, a) {
-    return `rgba(${r},${g},${b},${a})`
-  }
-
-  drawWhiteCore(bctx, W, H, {
-    base = 0.75*H,
-    len  = 0.28*W,
-    k    = 14,    
-  } = {}) {
-    const cy = H/2, L = Math.max(1, Math.round(len))
-    const samples = 80
-
-    const half = x => (base*0.5) / (1 + k * (x/L) * (x/L))
-
-    const path = new Path2D()
-    path.moveTo(0, cy - half(0))
-    for (let i=1;i<=samples;i++){
-      const x = (i/samples)*L
-      path.lineTo(x, cy - half(x))
-    }
-    for (let i=samples;i>=0;i--){
-      const x = (i/samples)*L
-      path.lineTo(x, cy + half(x))
-    }
-    path.closePath()
-
-    const g = bctx.createLinearGradient(0,0,L,0)
-    g.addColorStop(0.00, `rgba(255,255,255,1)`)
-    g.addColorStop(1.00, `rgba(255,255,255,0)`)
-
-    bctx.save()
-    bctx.fillStyle = g
-    bctx.fill(path)
-    bctx.restore()
   }
 }

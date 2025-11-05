@@ -30,7 +30,9 @@ class Config {
     }
 
     static colors = {
-        background: "#00102aff",
+        arenaBackground: "rgba(0, 16, 42, 1)",
+        gameBackground: "rgba(0, 61, 88, 1)",
+        menuBackground: "rgba(3, 58, 82, 1)",
         red: "rgba(167, 0, 0, 1)",
         pinkBase: "rgba(252, 148, 184, .7)",
         pinkHi: "rgba(255, 173, 203, .7)",

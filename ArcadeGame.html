@@ -21,57 +21,72 @@
 <body>
     <canvas id="canv"></canvas>
     <!-- Engine -->
-    <script src="../../engine/Engine.js"></script>
-    <script src="../../engine/AnimationManager.js"></script>
-    <script src="../../engine/Vector2.js"></script>
-    <script src="../../engine/Scene.js"></script>
-    <script src="../../engine/SceneManager.js"></script>
-    <script src="../../engine/GameObject.js"></script>
-    <script src="../../engine/CameraGameObject.js"></script>
-    <script src="../../engine/Component.js"></script>
-    <script src="../../engine/Input.js"></script>
-    <script src="../../engine/Time.js"></script>
-    <script src="../../engine/Collisions.js"></script>
-    <script src="../../engine/Mat2D.js"></script>
-    <script src="../../engine/MathUtils.js"></script>
+    <script src="../engine/Engine.js"></script>
+    <script src="../engine/AnimationManager.js"></script>
+    <script src="../engine/Vector2.js"></script>
+    <script src="../engine/Scene.js"></script>
+    <script src="../engine/SceneManager.js"></script>
+    <script src="../engine/GameObject.js"></script>
+    <script src="../engine/Component.js"></script>
+    <script src="../engine/CameraGameObject.js"></script>
+    <script src="../engine/Input.js"></script>
+    <script src="../engine/Time.js"></script>
+    <script src="../engine/Collisions.js"></script>
+    <script src="../engine/Mat2D.js"></script>
+    <script src="../engine/MathUtils.js"></script>
 
-    <script src="../../engine/components/Transform.js"></script>
-    <script src="../../engine/components/Camera2D.js"></script>
-    <script src="../../engine/components/Collider.js"></script>
-    <script src="../../engine/components/RigidBody.js"></script>
-    <script src="../../engine/components/Polygon.js"></script>
-    <script src="../../engine/components/PolygonCollider.js"></script>
-    <script src="../../engine/components/SweptCircle.js"></script>
-    <script src="../../engine/components/Circle.js"></script>
-    <script src="../../engine/components/Deform.js"></script>
+    <script src="../engine/components/Transform.js"></script>
+    <script src="../engine/components/Camera2D.js"></script>
+    <script src="../engine/components/Collider.js"></script>
+    <script src="../engine/components/RigidBody.js"></script>
+    <script src="../engine/components/Polygon.js"></script>
+    <script src="../engine/components/PolygonCollider.js"></script>
+    <script src="../engine/components/SweptCircle.js"></script>
+    <script src="../engine/components/Circle.js"></script>
+    <script src="../engine/components/Deform.js"></script>
+    <script src="../engine/components/Text.js"></script>
 
     <!-- Game -->
-    <script src="./game/utils/Config.js"></script>
-    <script src="./game/utils/CellMap.js"></script>
-    <script src="./game/utils/FPSTracker.js"></script>
+    <script src="./utils/Config.js"></script>
+    <script src="./utils/CellMap.js"></script>
+    <script src="./utils/FPSTracker.js"></script>
 
-    <script src="./game/scenes/GameScene.js"></script>
-    <script src="./game/prefabs/PlayableAreaGameObject.js"></script>
-    <script src="./game/prefabs/PlayerGameObject.js"></script>
-    <script src="./game/prefabs/LaserGameObject.js"></script>
-    <script src="./game/prefabs/EnemyGameObject.js"></script>
-    <script src="./game/prefabs/LightBeamGameObject.js"></script>
-    <script src="./game/prefabs/DebugGameObject.js"></script>
+    <script src="./scenes/MainMenuScene.js"></script>
+    <script src="./scenes/GameScene.js"></script>
+    <script src="./prefabs/PlayableAreaGameObject.js"></script>
+    <script src="./prefabs/PlayerGameObject.js"></script>
+    <script src="./prefabs/LaserGameObject.js"></script>
+    <script src="./prefabs/EnemyGameObject.js"></script>
+    <script src="./prefabs/LightBeamGameObject.js"></script>
+    <script src="./prefabs/DebugGameObject.js"></script>
+    <script src="./prefabs/MenuCameraGameObject.js"></script>
+    <script src="./prefabs/ProjectorBeamGameObject.js"></script>
+    <script src="./prefabs/TitleTextGameObject.js"></script>
+    <script src="./prefabs/CarouselControllerGameObject.js"></script>
+    <script src="./prefabs/CarouselGameObject.js"></script>
+    <script src="./prefabs/CarouselItemGameObject.js"></script>
+    <script src="./prefabs/CardHeaderGameObject.js"></script>
+    <script src="./prefabs/CardBodyGameObject.js"></script>
+    <script src="./prefabs/CardTextGameObject.js"></script>
+    <script src="./prefabs/GridBackgroundGameObject.js"></script>
 
-    <script src="./game/components/PlayerController.js"></script>
-    <script src="./game/components/FollowTargetController.js"></script>
-    <script src="./game/components/LaserController.js"></script>
-    <script src="./game/components/DebugController.js"></script>
-    <script src="./game/components/LightBeamController.js"></script>
+    <script src="./components/PlayerController.js"></script>
+    <script src="./components/FollowTargetController.js"></script>
+    <script src="./components/LaserController.js"></script>
+    <script src="./components/DebugController.js"></script>
+    <script src="./components/LightBeamController.js"></script>
+    <script src="./components/ProjectorBeamController.js"></script>
+    <script src="./components/CarouselController.js"></script>
+    <script src="./components/CardVisualController.js"></script>
+    <script src="./components/GridBackgroundController.js"></script>
 
-    <script src="./game/components/Enemies/PurpleEnemyController.js"></script>
-    <script src="./game/components/Enemies/BlueEnemyController.js"></script>
-    <script src="./game/components/Enemies/GreenEnemyController.js"></script>
-    <script src="./game/components/Enemies/PinkEnemyController.js"></script>
+    <script src="./components/Enemies/PurpleEnemyController.js"></script>
+    <script src="./components/Enemies/BlueEnemyController.js"></script>
+    <script src="./components/Enemies/GreenEnemyController.js"></script>
+    <script src="./components/Enemies/PinkEnemyController.js"></script>
 
     <script>
-
-        SceneManager.loadScene(new GameScene())
+        SceneManager.loadScene(new MainMenuScene())
         requestAnimationFrame(Engine.start)
     </script>
 </body>

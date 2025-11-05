@@ -17,7 +17,7 @@ class PlayableAreaGameObject extends GameObject {
         this.addComponent(new Polygon(), {
             points: points,
             fill: true,
-            fillStyle: Config.colors.background,
+            fillStyle: Config.colors.arenaBackground,
             lineWidth: 6,
             strokeStyle: "black"
         })
