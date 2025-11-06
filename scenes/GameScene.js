@@ -1,6 +1,13 @@
 class GameScene extends Scene {
     constructor() {
-        super()
+        super({
+            collisionPairs: [
+                ["player", "enemy"],
+                ["laser", "enemy"]
+            ],
+            trackedTags: ["enemy"]
+        })
+
         this.layerOrder = Object.values(Config.layers)
         this.initLayers()
 
@@ -27,7 +34,5 @@ class GameScene extends Scene {
         GameObject.instantiate(new DebugGameObject(), { scene: this, layer: Config.layers.debug })
         
         this.activeCamera = cam.getComponent(Camera2D)
-        this.enemies = new Map()
-        this.cellData = new CellMap()
     }
 }

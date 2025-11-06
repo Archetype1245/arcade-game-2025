@@ -1,6 +1,9 @@
 class MainMenuScene extends Scene {
     constructor() {
-        super()
+        super({
+            collisionPairs: [],
+            trackedTags: []
+        })
         this.layerOrder = ["background", "grid", "carouselBack", "projectorBeam", "carouselMid", "carouselFront", "ui"]
         this.initLayers()
 

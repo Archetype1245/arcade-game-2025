@@ -1,6 +1,6 @@
 class PlayerController extends Component {
     start() {
-        this.cam = GameObject.getObjectByName("CameraGameObject").getComponent(Camera2D)
+        this.cam = Camera2D.main.getComponent(Camera2D)
         this.speed = Config.speed.player
         this.framesSinceFired = Infinity
         this.fireRate = 5

@@ -1,10 +1,10 @@
 class EnemyGameObject extends GameObject {
     constructor(enemyType) {
         super("EnemyGameObject")
-        this.type = Config.objectType.enemy
+        this.tag = "enemy"
         this.subType = enemyType
         
-        SceneManager.currentScene.cellData.insert(this)
+        SceneManager.currentScene.spatialMap.insert(this)
 
         this.collider = this.addComponent(new PolygonCollider())
 

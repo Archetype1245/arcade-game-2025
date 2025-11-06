@@ -1,6 +1,5 @@
 class GreenEnemyController extends Component {
     start() {
-        this.cellData = SceneManager.getActiveScene().cellData
         this.player = GameObject.getObjectByName("PlayerGameObject")
 
         this.size = 30
@@ -108,9 +107,5 @@ class GreenEnemyController extends Component {
         this.transform.position = t
 
         this.polys.forEach(p => p.markDirty())
-    }
-
-    onDestroy() {
-        this.cellData.remove(this)
     }
 }

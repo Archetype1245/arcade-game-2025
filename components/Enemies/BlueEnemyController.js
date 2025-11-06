@@ -1,6 +1,5 @@
 class BlueEnemyController extends Component {
     start() {
-        this.cellData = SceneManager.getActiveScene().cellData
         this.player = GameObject.getObjectByName("PlayerGameObject")
         this.deform = this.gameObject.addComponent(new Deform())
 
@@ -121,9 +120,5 @@ class BlueEnemyController extends Component {
         this.transform.position = t
 
         this.polys.forEach(p => p.markDirty())
-    }
-
-    onDestroy() {
-        this.cellData.remove(this)
     }
 }

@@ -1,7 +1,7 @@
 class PlayerGameObject extends GameObject {
     constructor() {
         super("PlayerGameObject")
-        this.type = Config.objectType.player
+        this.tag = "player"
         this.size = 20
         this.transform.setScale(this.size)
 

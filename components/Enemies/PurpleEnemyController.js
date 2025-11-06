@@ -1,7 +1,5 @@
 class PurpleEnemyController extends Component {
     start() {
-        this.cellData = SceneManager.getActiveScene().cellData
-
         this.size = 24
         this.radius = Math.hypot(this.size, this.size)
         this.transform.setScale(this.size)
@@ -46,9 +44,5 @@ class PurpleEnemyController extends Component {
         this.transform.position = t
 
         this.polys.forEach(p => p.markDirty())
-    }
-
-    onDestroy() {
-        this.cellData.remove(this.gameObject)
     }
 }

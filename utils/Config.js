@@ -16,12 +16,6 @@ class Config {
         pinkEnemy: 400
     }
     
-    static objectType = {
-        player: 1<<0,
-        bullet: 1<<1,
-        enemy:  1<<2
-    }
-    
     static enemyTypes = {
         purple: 1<<0,
         blue:   1<<1,

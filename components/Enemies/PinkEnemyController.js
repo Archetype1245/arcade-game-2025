@@ -1,6 +1,5 @@
 class PinkEnemyController extends Component {
     start() {
-        this.cellData = SceneManager.getActiveScene().cellData
         this.player = GameObject.getObjectByName("PlayerGameObject")
 
         this.size = 38
@@ -94,9 +93,4 @@ class PinkEnemyController extends Component {
 
         this.polys.forEach(p => p.markDirty())
     }
-
-    onDestroy() {
-        this.cellData.remove(this)
-    }
-
 }
