@@ -1,10 +1,10 @@
-const _halfW = Config.playable.w / 2;
-const _halfH = Config.playable.h / 2;
+const b = Config.playable
+const inset = 30
 const corners = [
-    new Vector2(-_halfW, -_halfH),
-    new Vector2(-_halfW,  _halfH),
-    new Vector2( _halfW,  _halfH),
-    new Vector2( _halfW, -_halfH),
+    new Vector2(b.x1 + inset, b.y1 + inset),
+    new Vector2(b.x1 + inset, b.y2 - inset),
+    new Vector2(b.x2 - inset, b.y1 + inset),
+    new Vector2(b.x2 - inset, b.y2 - inset),
 ]
 
 // Corner Events

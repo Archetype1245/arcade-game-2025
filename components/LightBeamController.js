@@ -214,7 +214,7 @@ class LightBeam extends Component {
   }
 
 
-  static play(spawnPos, {
+  static triggerBeam(spawnPos, {
     scene = SceneManager.currentScene,
     layer = Config.layers.enemies,
     ...opts

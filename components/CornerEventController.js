@@ -16,6 +16,7 @@ class CornerEventController extends Component {
     }
 
     start() {
+        console.log(this.corners)
     }
 
     update(dt) {
@@ -23,7 +24,6 @@ class CornerEventController extends Component {
             this.gameObject.destroy()
             return
         }
-
         this.timeSinceLastSpawn += dt
 
         while (this.timeSinceLastSpawn >= this.spawnInterval && this.spawnsDone < this.totalToSpawn) {

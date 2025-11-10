@@ -1,6 +1,6 @@
 class SpawnManagerGameObject extends GameObject {
     constructor() {
         super("SpawnManagerGameObject")
-        this.addComponent(new SpawnManager())
+        this.addComponent(new SpawnController())
     }
 }

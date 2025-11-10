@@ -1,4 +1,4 @@
-class SpawnManager extends Component {
+class SpawnController extends Component {
 	constructor() {
 		super()
 
@@ -70,7 +70,7 @@ class SpawnManager extends Component {
 	}
 
 	async spawn(enemy, pos) {
-		await LightBeam.play(pos, {
+		await LightBeam.triggerBeam(pos, {
 			color: enemy.beamColor,
 			length: this.screenDiag
 		})
@@ -176,7 +176,6 @@ class SpawnManager extends Component {
 
 	generateSpawnPosition() {
 		const pp = this.player.transform.position
-		const b = Config.playable
 
 		const minRadius = 150
 		const maxRadius = this.screenDiag
@@ -185,9 +184,17 @@ class SpawnManager extends Component {
 
 		let x = pp.x + Math.cos(angle) * distance
 		let y = pp.y + Math.sin(angle) * distance
+		const spawnPos = this.ensureValidSpawnPosition(x, y)
+		
+		return spawnPos
+	}
 
-		x = Math.min(Math.max(x, b.x1 + 20), b.x2 - 20)
-		y = Math.min(Math.max(y, b.y1 + 20), b.y2 - 20)
+	ensureValidSpawnPosition(x, y) {
+		const b = Config.playable
+		const inset = 25
+
+		x = Math.min(Math.max(x, b.x1 + inset), b.x2 - inset)
+		y = Math.min(Math.max(y, b.y1 + inset), b.y2 - inset)
 
 		return new Vector2(x, y)
 	}

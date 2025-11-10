@@ -84,7 +84,7 @@ class GridBackgroundController extends Component {
         const sx = this._centerX + x * (this.scaleX * invZ)
         const sy = this._horizonY + this.fakeCamY * (this.scaleY * invZ)
 
-        return { x: sx, y: sy }
+        return new Vector2(sx, sy)
     }
 
     _projectPointCurved(x, z, h) {
@@ -101,7 +101,7 @@ class GridBackgroundController extends Component {
 
         sy -= bend
 
-        return { x: sx, y: sy }
+        return new Vector2(sx, sy)
     }
 
     _stripColorForZ(zMid) {
