@@ -5,15 +5,18 @@ class Config {
         zoom: 1
     }
 
-    static playable = { x1: 0, y1: 0, x2: 1800, y2: 1200, w: 1800, h: 1200 }
+    static playable = { x1: 0,    y1: 0,
+                        x2: 1800, y2: 1200,
+                        w:  1800, h:  1200,
+    }
 
     static speed = {
         player: 500,
         bullets: 1400,
         purpleEnemy: 200,
-        blueEnemy: 275,
-        greenEnemy: 350,
-        pinkEnemy: 400
+        blueEnemy: 350,
+        greenEnemy: 400,
+        pinkEnemy: 425
     }
     
     static enemyTypes = {

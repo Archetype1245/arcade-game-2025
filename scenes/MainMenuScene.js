@@ -37,14 +37,16 @@ class MainMenuScene extends Scene {
             layer: "background"
         })
 
-        const bgGrid = GameObject.instantiate(new GridBackgroundGameObject({
-                horizonRatio: 0.4,    // 0 = top, 1 = bottom
-                camY: 16,
-                gridSpacing: 3,
+        GameObject.instantiate(new GridBackgroundGameObject({
+                horizonRatio: 0.4,
+                fakeCamY: 16,
                 zNear: 1,
                 zFar: 80,
                 scrollSpeed: -1.5,
-            }), { scene: this, layer: "grid" }
-        );
+            }), {
+                scene: this,
+                layer: "grid" 
+                }
+        )
     }
 }

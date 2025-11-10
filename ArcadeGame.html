@@ -48,12 +48,19 @@
     <script src="../engine/components/Text.js"></script>
 
     <!-- Game -->
-    <script src="./utils/Config.js"></script>
-    <script src="./utils/FPSTracker.js"></script>
+    <script src="./data/Config.js"></script>
+    <script src="./data/GameGlobals.js"></script>
+    <script src="./data/IntensityConfig.js"></script>
+    <script src="./data/EnemyDefs.js"></script>
+    <script src="./data/EventDefs.js"></script>
+
+    <!-- <script src="./utils/FPSTracker.js"></script> -->
+    <script src="./utils/EventScriptRunner.js"></script>
 
     <script src="./scenes/MainMenuScene.js"></script>
     <script src="./scenes/GameScene.js"></script>
     <script src="./prefabs/PlayableAreaGameObject.js"></script>
+    <script src="./prefabs/UIDisplayGameObject.js"></script>
     <script src="./prefabs/PlayerGameObject.js"></script>
     <script src="./prefabs/LaserGameObject.js"></script>
     <script src="./prefabs/EnemyGameObject.js"></script>
@@ -69,9 +76,11 @@
     <script src="./prefabs/CardBodyGameObject.js"></script>
     <script src="./prefabs/CardTextGameObject.js"></script>
     <script src="./prefabs/GridBackgroundGameObject.js"></script>
+    <script src="./prefabs/SpawnManagerGameObject.js"></script>
 
     <script src="./components/PlayerController.js"></script>
     <script src="./components/FollowTargetController.js"></script>
+    <script src="./components/UIDisplayController.js"></script>
     <script src="./components/LaserController.js"></script>
     <script src="./components/DebugController.js"></script>
     <script src="./components/LightBeamController.js"></script>
@@ -79,6 +88,9 @@
     <script src="./components/CarouselController.js"></script>
     <script src="./components/CardVisualController.js"></script>
     <script src="./components/GridBackgroundController.js"></script>
+    <script src="./components/SpawnManager.js"></script>
+    <script src="./components/RingEventController.js"></script>
+    <script src="./components/CornerEventController.js"></script>
 
     <script src="./components/Enemies/PurpleEnemyController.js"></script>
     <script src="./components/Enemies/BlueEnemyController.js"></script>

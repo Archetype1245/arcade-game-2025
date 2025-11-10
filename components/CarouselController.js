@@ -40,7 +40,6 @@ class CarouselController extends Component {
 
     update() {
         if (this.rotationCooldown > 0) this.rotationCooldown -= Time.deltaTime   // TODO: look into making this a Transition??
-
         // Handle rotation animation
         if (this.isRotating) {
             this.rotationProgress += Time.deltaTime / this.rotationDuration
@@ -184,7 +183,7 @@ class CarouselController extends Component {
                 console.log("Leaderboards not implemented yet")
                 break
             case "quit":
-                console.log("Quit not implemented (would close game)")
+                console.log("Quit not implemented")
                 break
         }
     }

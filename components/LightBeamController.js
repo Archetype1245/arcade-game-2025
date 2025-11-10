@@ -1,8 +1,8 @@
 class LightBeam extends Component {
   constructor({
     color = Config.beamColors.purpleBeam,
-    duration = 1,
-    width = 10,
+    duration = 1.2,
+    width = 40,
 
     beamGlow = 18,
     baseGlowRadius = 40,
@@ -27,7 +27,7 @@ class LightBeam extends Component {
       maxAlpha, length, onComplete
     })
 
-    this._L = Math.max(1, length || Math.hypot(Engine.canvas.width, Engine.canvas.height))
+    this._L = Math.max(1, length || Math.hypot(Engine.canvas.width/2, Engine.canvas.height/2))
     this.player = GameObject.getObjectByName("PlayerGameObject")
     this.started = false
   }

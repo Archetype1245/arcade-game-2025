@@ -1,0 +1,194 @@
+class SpawnManager extends Component {
+	constructor() {
+		super()
+
+		// Initial values currently tuned for testing various things - TODO: adjust for normal gameplay when done
+		this.intensity = 7
+
+		this.timeSinceEnemySpawn = IntensityConfig.spawnIntervalMax
+		this.timeSinceEventCheck = 8
+
+		this.eventCooldowns = {}
+		for (const eventId in EventDefs) {
+			this.eventCooldowns[eventId] = 0
+		}
+	}
+
+	start() {
+		this.player = GameObject.getObjectByName("PlayerGameObject")
+		this.screenDiag = Math.hypot(Engine.canvas.width / 2, Engine.canvas.height / 2)
+	}
+
+	update(dt) {
+		this.updateIntensity(dt);
+
+		this.timeSinceEnemySpawn += dt
+		this.timeSinceEventCheck += dt
+
+		const currentSpawnInterval = this.getCurrentSpawnInterval()
+
+		for (const eventId in this.eventCooldowns) {
+			if (this.eventCooldowns[eventId] > 0) {
+				this.eventCooldowns[eventId] = Math.max(0, this.eventCooldowns[eventId] - dt)
+			}
+		}
+
+		if (this.timeSinceEventCheck >= IntensityConfig.eventCheckInterval) {
+			// const event = EventDefs.blue_corner_rain
+			const event = EventDefs.blue_ring_burst
+			EventScriptRunner.runScript(event.scriptId, this, event)
+
+			this.timeSinceEventCheck = 0
+		}
+
+		if (this.timeSinceEnemySpawn >= currentSpawnInterval) {
+			this.spawnEnemies()
+			this.timeSinceEnemySpawn = 0
+		}
+	}
+
+	updateIntensity(dt) {
+		const currentScore = GameGlobals.score || 0
+
+		const baseGain = IntensityConfig.baseGainPerSecond * dt
+		const scoreGain = currentScore > 0 ? Math.pow(Math.log10(currentScore), 2) * dt : 0
+
+		this.intensity += Math.max(baseGain, scoreGain)
+		this.intensity = Math.min(this.intensity, IntensityConfig.maxIntensity)
+	}
+
+	getCurrentSpawnInterval() {
+		const t = Math.min(1, this.intensity / IntensityConfig.spawnIntervalScaleIntensity)
+		return IntensityConfig.spawnIntervalMax -
+			(IntensityConfig.spawnIntervalMax - IntensityConfig.spawnIntervalMin) * t
+	}
+
+	getSpawnsPerTick() {
+		const t = Math.min(1, this.intensity / 100)
+		const range = IntensityConfig.maxSpawnsPerTick - IntensityConfig.minSpawnsPerTick
+		return Math.floor(IntensityConfig.minSpawnsPerTick + range * t)
+	}
+
+	async spawn(enemy, pos) {
+		await LightBeam.play(pos, {
+			color: enemy.beamColor,
+			length: this.screenDiag
+		})
+
+		GameObject.instantiate(new EnemyGameObject(enemy, enemy.type), {
+			scene: SceneManager.currentScene,
+			layer: Config.layers.enemies,
+			position: pos
+		})
+	}
+
+	spawnEnemies() {
+		let budget = this.intensity
+		const currentScore = GameGlobals.score || 0
+
+		const eligibleEnemies = []
+		for (const enemyId in EnemyDefs) {
+			const enemy = EnemyDefs[enemyId]
+			if (enemy.cost <= budget &&
+				this.intensity >= enemy.minIntensity &&
+				currentScore >= enemy.minScore) {
+				eligibleEnemies.push(enemy)
+			}
+		}
+
+		if (eligibleEnemies.length === 0) return
+
+		const maxSpawnsThisTick = this.getSpawnsPerTick()
+
+		let spawnsThisTick = 0
+		while (spawnsThisTick < maxSpawnsThisTick && budget > 0) {
+			const affordableEnemies = eligibleEnemies.filter(e => e.cost <= budget)
+			if (affordableEnemies.length === 0) {
+				break
+			}
+
+			const enemy = this.selectWeighted(affordableEnemies)
+			if (!enemy) {
+				break
+			}
+
+			budget -= enemy.cost
+			const position = this.generateSpawnPosition()
+			this.spawn(enemy, position)
+
+			spawnsThisTick++
+		}
+
+		this.intensity = budget
+	}
+
+	checkAndSpawnEvent() {
+		if (this.intensity < IntensityConfig.minIntensityForEvents) {
+			return
+		}
+
+		const currentScore = GameGlobals.score || 0
+
+		const eligibleEvents = [];
+		for (const eventId in EventDefs) {
+			const event = EventDefs[eventId]
+			if (this.intensity >= event.cost && this.intensity >= event.minIntensity &&
+				currentScore >= event.minScore && this.eventCooldowns[eventId] === 0) {
+
+				eligibleEvents.push(event)
+			}
+		}
+
+		if (eligibleEvents.length === 0) {
+			return
+		}
+
+		const event = this.selectWeighted(eligibleEvents)
+		if (!event) {
+			return
+		}
+
+		this.intensity -= event.cost
+		this.eventCooldowns[event.id] = event.cooldown
+		EventScriptRunner.runScript(event.scriptId, this, event)
+	}
+
+	selectWeighted(items) {
+		if (items.length === 0) {
+			return null
+		}
+
+		const totalWeight = items.reduce((sum, item) => sum + item.weight, 0)
+		if (totalWeight <= 0) {
+			return items[0]
+		}
+
+		let random = Math.random() * totalWeight;
+		for (const item of items) {
+			random -= item.weight
+			if (random <= 0) {
+				return item
+			}
+		}
+
+		return items[items.length - 1]
+	}
+
+	generateSpawnPosition() {
+		const pp = this.player.transform.position
+		const b = Config.playable
+
+		const minRadius = 150
+		const maxRadius = this.screenDiag
+		const angle = Math.random() * Math.PI * 2
+		const distance = minRadius + Math.random() * (maxRadius - minRadius)
+
+		let x = pp.x + Math.cos(angle) * distance
+		let y = pp.y + Math.sin(angle) * distance
+
+		x = Math.min(Math.max(x, b.x1 + 20), b.x2 - 20)
+		y = Math.min(Math.max(y, b.y1 + 20), b.y2 - 20)
+
+		return new Vector2(x, y)
+	}
+}

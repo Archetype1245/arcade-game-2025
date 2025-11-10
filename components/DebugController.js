@@ -28,7 +28,6 @@ class DebugController extends Component {
 
     async spawnEnemyDebug(enemyType) {
         const pos = this.cam.screenPointToWorld(new Vector2(Input.mouseX, Input.mouseY))
-        const player = GameObject.getObjectByName("PlayerGameObject")
         let color
 
         switch (enemyType) {
@@ -48,14 +47,11 @@ class DebugController extends Component {
 
         await LightBeam.play(pos, {
             color: color,
-            duration: 1.2,
-            width: 40,
-            playerName: "PlayerGameObject",
-            length: Math.hypot(Engine.canvas.width, Engine.canvas.height)
+            length: Math.hypot(Engine.canvas.width/2, Engine.canvas.height/2)
         })
 
         GameObject.instantiate(new EnemyGameObject(enemyType), {
-            scene: Engine.currentScene,
+            scene: SceneManager.currentScene,
             layer: Config.layers.enemies,
             position: pos
         })

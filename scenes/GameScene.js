@@ -32,7 +32,11 @@ class GameScene extends Scene {
 
         GameObject.instantiate(new PlayableAreaGameObject(), { scene: this })
         GameObject.instantiate(new DebugGameObject(), { scene: this, layer: Config.layers.debug })
+        GameObject.instantiate(new SpawnManagerGameObject(), { scene: this })
+        GameObject.instantiate(new UIDisplayGameObject(), { scene: this, layer: "ui" })
         
         this.activeCamera = cam.getComponent(Camera2D)
+
+        GameGlobals.score = 0
     }
 }

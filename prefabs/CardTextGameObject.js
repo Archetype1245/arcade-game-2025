@@ -6,7 +6,7 @@ class CardTextGameObject extends GameObject {
         this.addComponent(new Text(), {
             text: text,
             fillStyle: "rgba(220, 240, 255, 1.0)",
-            font: "bold 18px Arial, sans-serif",
+            font: "bold 36px Arial, sans-serif",
             textAlign: "center",
             textBaseline: "middle",
             glow: true,

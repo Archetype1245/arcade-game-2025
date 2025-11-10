@@ -59,8 +59,9 @@ class FPSTracker {
     const el = document.createElement('div');
     Object.assign(el.style, {
       position: 'fixed',
-      left: '8px',
       top: '8px',
+      left: '50%',
+      transform: 'translateX(-50%)',
       padding: '6px 8px',
       background: 'rgba(0,0,0,0.6)',
       color: '#0f0',

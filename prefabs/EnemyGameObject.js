@@ -1,8 +1,9 @@
 class EnemyGameObject extends GameObject {
-    constructor(enemyType) {
+    constructor(enemyID, enemyType) {
         super("EnemyGameObject")
         this.tag = "enemy"
-        this.subType = enemyType
+        this.enemyID = enemyID
+        this.enemyType = enemyType
         
         SceneManager.currentScene.spatialMap.insert(this)
 

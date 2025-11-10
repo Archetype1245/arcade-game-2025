@@ -1,7 +1,7 @@
 class GridBackgroundController extends Component {
     constructor({
-        horizonRatio = 0.6,
-        camY = 8,
+        horizonRatio = 0.4,
+        fakeCamY = 16,
         scaleX = 400,
         scaleY = 250,
 
@@ -13,14 +13,14 @@ class GridBackgroundController extends Component {
         zHorizon = 40,
         cellsInDepth = 90,     // how many rows from near to far
 
-        scrollSpeed = 10,
+        scrollSpeed = -5,
         lineAlpha = 1,
         stripsAlpha = 0.5,
     } = {}) {
         super()
 
         this.horizonRatio = horizonRatio
-        this.camY = camY
+        this.fakeCamY = fakeCamY
         this.scaleX = scaleX
         this.scaleY = scaleY
 
@@ -56,6 +56,7 @@ class GridBackgroundController extends Component {
 
     draw(ctx) {
         ctx.save()
+        // Ignores camera transform (draws in screen space)  TODO: adjust layer system to handle screen space layers behind others?
         ctx.setTransform(1, 0, 0, 1, 0, 0)
 
         const w = ctx.canvas.width
@@ -80,8 +81,8 @@ class GridBackgroundController extends Component {
         if (Math.abs(z) < MathUtils.EPS) z += MathUtils.EPS
         const invZ = 1 / z
 
-        const sx = this._centerX + x * invZ * this.scaleX
-        const sy = this._horizonY + this.camY * invZ * this.scaleY
+        const sx = this._centerX + x * (this.scaleX * invZ)
+        const sy = this._horizonY + this.fakeCamY * (this.scaleY * invZ)
 
         return { x: sx, y: sy }
     }
@@ -130,10 +131,10 @@ class GridBackgroundController extends Component {
 
             const clampedMid = Math.min(zMid, this.zHorizon)
 
-            const leftFront = this._projectPointFlat(-this.halfWidth, z0)
+            const leftFront =  this._projectPointFlat(-this.halfWidth, z0)
             const rightFront = this._projectPointFlat(+this.halfWidth, z0)
-            const rightBack = this._projectPointFlat(+this.halfWidth, Math.min(z1, this.zHorizon))
-            const leftBack = this._projectPointFlat(-this.halfWidth, Math.min(z1, this.zHorizon))
+            const rightBack =  this._projectPointFlat(+this.halfWidth, Math.min(z1, this.zHorizon))
+            const leftBack =   this._projectPointFlat(-this.halfWidth, Math.min(z1, this.zHorizon))
 
             ctx.beginPath()
             ctx.moveTo(leftFront.x, leftFront.y)

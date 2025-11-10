@@ -37,7 +37,6 @@ class LaserController extends Component {
         this.gameObject.swept.capturePrev()
         this.velocity.setVec(this.speed * Time.deltaTime * this.cos, this.speed * Time.deltaTime * this.sin)
         this.transform.translate(this.velocity.x, this.velocity.y)
-        // this.col.markDirty()
 
         if (this.transform.position.x < this.bounds.x1 || this.transform.position.x > this.bounds.x2 ||
             this.transform.position.y < this.bounds.y1 || this.transform.position.y > this.bounds.y2) {
@@ -47,6 +46,10 @@ class LaserController extends Component {
 
     onCollisionEnter(other) {
         if (other instanceof EnemyGameObject) {
+            const enemyID = other.enemyID
+
+            GameGlobals.score += enemyID.scoreValue
+
             this.gameObject.destroy()
             other.destroy()
         }

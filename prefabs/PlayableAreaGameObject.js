@@ -9,11 +9,11 @@ class PlayableAreaGameObject extends GameObject {
         this.transform.position = { x: cx, y: cy }
 
         const points =
-            [new Vector2(-w/2, -h/2),
-             new Vector2( w/2, -h/2),
-             new Vector2( w/2,  h/2),
-             new Vector2(-w/2,  h/2)]
-        
+            [new Vector2(-w / 2, -h / 2),
+            new Vector2(w / 2, -h / 2),
+            new Vector2(w / 2, h / 2),
+            new Vector2(-w / 2, h / 2)]
+
         this.addComponent(new Polygon(), {
             points: points,
             fill: true,
