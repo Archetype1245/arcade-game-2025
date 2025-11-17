@@ -35,14 +35,25 @@ class PurpleEnemyController extends Component {
         // Moves in whatever random direction was decided on spawn
         let t = this.transform.position
         t.plusEquals(this.dir.times(this.speed * Time.deltaTime))
+
         // Bounce off the edges of the arena and stay in bounds
-        if (t.x < Config.playable.x1 + this.radius) { t.x = Config.playable.x1 + this.radius; this.dir.x *= -1 }
-        if (t.x > Config.playable.x2 - this.radius) { t.x = Config.playable.x2 - this.radius; this.dir.x *= -1 }
-        if (t.y < Config.playable.y1 + this.radius) { t.y = Config.playable.y1 + this.radius; this.dir.y *= -1 }
-        if (t.y > Config.playable.y2 - this.radius) { t.y = Config.playable.y2 - this.radius; this.dir.y *= -1 }
+        if (t.x < Config.playable.x1 + this.radius) {
+            t.x = Config.playable.x1 + this.radius
+            this.dir.x *= -1
+        } else if (t.x > Config.playable.x2 - this.radius) {
+            t.x = Config.playable.x2 - this.radius
+            this.dir.x *= -1
+        }
+
+        if (t.y < Config.playable.y1 + this.radius) {
+            t.y = Config.playable.y1 + this.radius
+            this.dir.y *= -1
+        } else if (t.y > Config.playable.y2 - this.radius) {
+            t.y = Config.playable.y2 - this.radius
+            this.dir.y *= -1
+        }
 
         this.transform.position = t
-
         this.polys.forEach(p => p.markDirty())
     }
 }
