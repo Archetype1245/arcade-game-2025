@@ -88,6 +88,14 @@ class BlueEnemyController extends Component {
 
         this.polys = [this.gameObject.collider, this.topFrontPoly, /*this.topRightPoly, this.bottomFrontPoly,*/
                       this.midShadePolys, this.bottomRightPoly, this.frontLines, this.backLines]
+
+        // Define shape bounds for generic clamping
+        this.shapeBounds = {
+            top: this.defs.top.y * this.size,
+            bot: this.defs.bot.y * this.size,
+            left: this.defs.fL.x * this.size,
+            right: this.defs.bR.x * this.size
+        }
     }
 
     update() {
@@ -96,29 +104,7 @@ class BlueEnemyController extends Component {
         const su = 1 + s
         const sv = 1 / su
         this.deform.setScaleUV(su, sv)
-
-        // Turn towards player (OFF FOR NOW)
-        // const newR = Math.atan2(dir.y, dir.x)
-        // this.transform.setRotation(newR + Math.PI/2)
-
-        let t = this.transform.position
-        const p = this.player.transform.position
-        const dir = p.getDirectionVector(t)
-        t.plusEquals(dir.timesEquals(this.speed * Time.deltaTime))
-
-        // Stay in bounds
-        const bounds = {
-            top: this.defs.top.y * this.size,
-            bot: this.defs.bot.y * this.size,
-            left: this.defs.fL.x * this.size,
-            right: this.defs.bR.x * this.size
-        }
-        if (t.x < Config.playable.x1 - bounds.left) t.x = Config.playable.x1 - bounds.left
-        if (t.x > Config.playable.x2 - bounds.right) t.x = Config.playable.x2 - bounds.right
-        if (t.y < Config.playable.y1 - bounds.top) t.y = Config.playable.y1 - bounds.top
-        if (t.y > Config.playable.y2 - bounds.bot) t.y = Config.playable.y2 - bounds.bot
-        this.transform.position = t
-
+        
         this.polys.forEach(p => p.markDirty())
     }
 }

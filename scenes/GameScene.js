@@ -5,7 +5,7 @@ class GameScene extends Scene {
                 ["player", "enemy"],
                 ["laser", "enemy"]
             ],
-            trackedTags: ["enemy"]
+            trackedTags: ["enemy", "laser"]
         })
 
         this.layerOrder = Object.values(Config.layers)

@@ -26,6 +26,14 @@ class GreenEnemyController extends Component {
             bM: new Vector2(0.04, 0.14)
         }
 
+        // Set shape bounds for proper boundary clamping
+        this.shapeBounds = {
+            top: this.outer.tL.y * this.size,
+            bot: this.outer.bL.y * this.size,
+            left: this.outer.tL.x * this.size,
+            right: this.outer.tR.x * this.size
+        }
+
         // Build polygons/paths/collision
         this.gameObject.collider.points = [this.outer.tL, this.outer.bL, this.outer.bR, this.outer.tR]
 
@@ -93,18 +101,6 @@ class GreenEnemyController extends Component {
         const unrotatedBM = Mat2D.applyRSToPoint(invRotMatrix, this.midOffsets.bM)
         this.inner.tM.setVec(unrotatedTM.x, unrotatedTM.y)
         this.inner.bM.setVec(unrotatedBM.x, unrotatedBM.y)
-
-        // Chases player
-        let t = this.transform.position
-        const p = this.player.transform.position
-        const dir = p.getDirectionVector(t)
-        t.plusEquals(dir.times(this.speed * Time.deltaTime))
-        // Stay in bounds
-        if (t.x < Config.playable.x1 + this.radius) t.x = this.radius
-        if (t.x > Config.playable.x2 - this.radius) t.x = Config.playable.x2 - this.radius
-        if (t.y < Config.playable.y1 + this.radius) t.y = this.radius
-        if (t.y > Config.playable.y2 - this.radius) t.y = Config.playable.y2 - this.radius
-        this.transform.position = t
 
         this.polys.forEach(p => p.markDirty())
     }

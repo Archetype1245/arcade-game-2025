@@ -75,7 +75,27 @@ class SpawnController extends Component {
 			length: this.screenDiag
 		})
 
-		GameObject.instantiate(new EnemyGameObject(enemy, enemy.type), {
+		// Create the appropriate enemy prefab based on type
+		let enemyGameObject
+		switch (enemy.type) {
+			case Config.enemyTypes.purple:
+				enemyGameObject = new PurpleEnemyGameObject(enemy)
+				break
+			case Config.enemyTypes.blue:
+				enemyGameObject = new BlueEnemyGameObject(enemy)
+				break
+			case Config.enemyTypes.green:
+				enemyGameObject = new GreenEnemyGameObject(enemy)
+				break
+			case Config.enemyTypes.pink:
+				enemyGameObject = new PinkEnemyGameObject(enemy)
+				break
+			default:
+				console.warn("Unknown enemy type:", enemy.type)
+				return
+		}
+
+		GameObject.instantiate(enemyGameObject, {
 			scene: SceneManager.currentScene,
 			layer: Config.layers.enemies,
 			position: pos
@@ -129,7 +149,7 @@ class SpawnController extends Component {
 
 		const currentScore = GameGlobals.score || 0
 
-		const eligibleEvents = [];
+		const eligibleEvents = []
 		for (const eventId in EventDefs) {
 			const event = EventDefs[eventId]
 			if (this.intensity >= event.cost && this.intensity >= event.minIntensity &&

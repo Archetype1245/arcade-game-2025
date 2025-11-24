@@ -2,11 +2,11 @@ class CarouselController extends Component {
     constructor() {
         super()
         this.menuItems = [
-            { text: "Game Mode 1", action: "startGame" },
-            { text: "Game Mode 2", action: "gameMode2" },
-            { text: "Settings", action: "settings" },
+            { text: "Game Mode 1",  action: "startGame" },
+            { text: "Game Mode 2",  action: "gameMode2" },
+            { text: "Settings",     action: "settings" },
             { text: "Leaderboards", action: "leaderboards" },
-            { text: "Quit Game", action: "quit" }
+            { text: "Quit Game",    action: "quit" }
         ]
         this.currentIndex = 0
         this.carouselObjects = []

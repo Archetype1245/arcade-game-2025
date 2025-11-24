@@ -75,22 +75,14 @@ class PinkEnemyController extends Component {
 
     update() {
         const p = this.player.transform.position
-        let t = this.transform.position
-
+        const t = this.transform.position
+        
         const dir = p.getDirectionVector(t)
-        const r = Math.atan2(dir.y, dir.x)                                                    // Angle to make the enemy "face" the player
-
-        const wobble = (Math.PI / 6) * (Math.sin((2 * Math.PI / this.period) * Time.time))    // Oscillation between +- 30 degrees
-        this.transform.setRotation(r + wobble)                                                // Enemy turns to "face" the player but always has the oscillation
-
-        t.plusEquals(dir.times(this.speed * Time.deltaTime))
-        // Stay in bounds
-        if (t.x < Config.playable.x1 + this.radius) t.x = this.radius
-        if (t.x > Config.playable.x2 - this.radius) t.x = Config.playable.x2 - this.radius
-        if (t.y < Config.playable.y1 + this.radius) t.y = this.radius
-        if (t.y > Config.playable.y2 - this.radius) t.y = Config.playable.y2 - this.radius
-        this.transform.position = t
-
+        const r = Math.atan2(dir.y, dir.x)  // Angle to make the enemy "face" the player
+        
+        const wobble = (Math.PI / 6) * (Math.sin((2 * Math.PI / this.period) * Time.time))  // Oscillation between +- 30 degrees
+        this.transform.setRotation(r + wobble)  // Enemy turns to "face" the player but always has the oscillation
+        
         this.polys.forEach(p => p.markDirty())
     }
 }

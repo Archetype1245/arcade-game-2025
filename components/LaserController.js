@@ -45,10 +45,12 @@ class LaserController extends Component {
     }
 
     onCollisionEnter(other) {
-        if (other instanceof EnemyGameObject) {
-            const enemyID = other.enemyID
+        if (other instanceof BaseEnemyGameObject) {
+            const enemyDef = other.enemyDef
 
-            GameGlobals.score += enemyID.scoreValue
+            if (enemyDef && enemyDef.scoreValue) {
+                GameGlobals.score += enemyDef.scoreValue
+            }
 
             this.gameObject.destroy()
             other.destroy()
