@@ -6,55 +6,51 @@ class DebugController extends Component {
 
     update() {
         if (Input.keyHeld("ShiftLeft")) {
-            let enemyType = null
+            let enemyId = null
             if (Input.keyPressed("Digit1")) {
-                enemyType = Config.enemyTypes.purple
+                enemyId = "PurpleEnemy"
             } else if (Input.keyPressed("Digit2")) {
-                enemyType = Config.enemyTypes.blue
+                enemyId = "BlueEnemy"
             } else if (Input.keyPressed("Digit3")) {
-                enemyType = Config.enemyTypes.green
+                enemyId = "GreenEnemy"
             } else if (Input.keyPressed("Digit4")) {
-                enemyType = Config.enemyTypes.pink
+                enemyId = "PinkEnemy"
             }
 
-            if (enemyType) {
+            if (enemyId) {
+                const enemy = EnemyDefs[enemyId]
                 for (let i = 0; i < 1; i++) {
-                    this.spawnEnemyDebug(enemyType)
+                    this.spawnEnemyDebug(enemy)
                 }
             }
         }
     }
 
 
-    async spawnEnemyDebug(enemyType) {
+    async spawnEnemyDebug(enemy) {
         const pos = this.cam.screenPointToWorld(new Vector2(Input.mouseX, Input.mouseY))
-        let color
         let enemyGameObject
 
-        switch (enemyType) {
+        switch (enemy.type) {
             case Config.enemyTypes.purple:
-                color = Config.beamColors.purpleBeam
-                enemyGameObject = new PurpleEnemyGameObject(null)
+                enemyGameObject = new PurpleEnemyGameObject(enemy)
                 break
             case Config.enemyTypes.blue:
-                color = Config.beamColors.lightBlueBeam
-                enemyGameObject = new BlueEnemyGameObject(null)
+                enemyGameObject = new BlueEnemyGameObject(enemy)
                 break
             case Config.enemyTypes.pink:
-                color = Config.beamColors.pinkBeam
-                enemyGameObject = new PinkEnemyGameObject(null)
+                enemyGameObject = new PinkEnemyGameObject(enemy)
                 break
             case Config.enemyTypes.green:
-                color = Config.beamColors.greenBeam
-                enemyGameObject = new GreenEnemyGameObject(null)
+                enemyGameObject = new GreenEnemyGameObject(enemy)
                 break
             default:
-                console.warn("Unknown enemy type in debug:", enemyType)
+                console.warn("Unknown enemy type in debug:", enemy.type)
                 return
         }
 
-        await LightBeam.play(pos, {
-            color: color,
+        await LightBeam.triggerBeam(pos, {
+            color: enemy.beamColor,
             length: Math.hypot(Engine.canvas.width/2, Engine.canvas.height/2)
         })
 

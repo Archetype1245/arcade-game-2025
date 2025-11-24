@@ -1,6 +1,3 @@
-// game/ai/GenericBehavior.js
-
-// Move towards the player
 class BTMoveTowardsPlayer extends BTNode {
     constructor(controller) {
         super()
@@ -17,21 +14,17 @@ class BTMoveTowardsPlayer extends BTNode {
         const playerPos = player.transform.position
         let pos = transform.position
 
-        // Calculate direction to player - use same pattern as original enemies
         const dir = playerPos.getDirectionVector(pos)
-        
-        // Move towards player - use same pattern as original
-        const speed = this.controller.speed || 100
+        const speed = this.controller.speed
         pos.plusEquals(dir.times(speed * Time.deltaTime))
-        
-        // Commit position change
+
         transform.position = pos
 
         return BehaviorTree.SUCCEEDED
     }
 }
 
-// Clamp position inside playable bounds - now handles shapeBounds
+// Generalized to handle shape bounds (for weird shapes like the Blue enemy), otherwise defaults to bounds based on radius
 class BTClampInsidePlayableBounds extends BTNode {
     constructor(controller) {
         super()
@@ -42,22 +35,9 @@ class BTClampInsidePlayableBounds extends BTNode {
         const transform = this.controller.transform
         let pos = transform.position
         const bounds = Config.playable
-        
-        // Get shape bounds or fall back to radius-based bounds
-        let shapeBounds
-        if (this.controller.shapeBounds) {
-            shapeBounds = this.controller.shapeBounds
-        } else {
-            const radius = this.controller.radius || 0
-            shapeBounds = {
-                left: -radius,
-                right: radius,
-                top: -radius,
-                bot: radius
-            }
-        }
 
-        // Compute effective bounds for the center position
+        let shapeBounds = setShapeBounds(this.controller)
+
         const minX = bounds.x1 - shapeBounds.left
         const maxX = bounds.x2 - shapeBounds.right
         const minY = bounds.y1 - shapeBounds.top
@@ -66,15 +46,14 @@ class BTClampInsidePlayableBounds extends BTNode {
         // Clamp position to stay inside bounds
         pos.x = Math.min(Math.max(pos.x, minX), maxX)
         pos.y = Math.min(Math.max(pos.y, minY), maxY)
-        
-        // Commit position change
+
         transform.position = pos
 
         return BehaviorTree.SUCCEEDED
     }
 }
 
-// Move in a fixed direction (WITHOUT bouncing)
+// Move in a fixed direction
 class BTMoveInDirection extends BTNode {
     constructor(controller) {
         super()
@@ -85,13 +64,12 @@ class BTMoveInDirection extends BTNode {
         const transform = this.controller.transform
         let pos = transform.position
         const speed = this.controller.speed || 100
-        
+
         // Move in the controller's direction
         pos.plusEquals(this.controller.dir.times(speed * Time.deltaTime))
-        
-        // Commit position change
+
         transform.position = pos
-        
+
         return BehaviorTree.SUCCEEDED
     }
 }
@@ -107,20 +85,8 @@ class BTBounceOffWalls extends BTNode {
         const transform = this.controller.transform
         let pos = transform.position
         const bounds = Config.playable
-        
-        // Get shape bounds or fall back to radius-based bounds
-        let shapeBounds
-        if (this.controller.shapeBounds) {
-            shapeBounds = this.controller.shapeBounds
-        } else {
-            const radius = this.controller.radius || 0
-            shapeBounds = {
-                left: -radius,
-                right: radius,
-                top: -radius,
-                bot: radius
-            }
-        }
+
+        let shapeBounds = setShapeBounds(this.controller)
 
         // Check bounds and flip direction if needed
         if (pos.x < bounds.x1 - shapeBounds.left) {
@@ -138,15 +104,14 @@ class BTBounceOffWalls extends BTNode {
             pos.y = bounds.y2 - shapeBounds.bot
             this.controller.dir.y *= -1
         }
-        
-        // Commit position change
+
         transform.position = pos
 
         return BehaviorTree.SUCCEEDED
     }
 }
 
-// Face towards the player (without wobble)
+// Face towards the player
 class BTFacePlayer extends BTNode {
     constructor(controller) {
         super()
@@ -162,13 +127,12 @@ class BTFacePlayer extends BTNode {
         const transform = this.controller.transform
         const playerPos = player.transform.position
         const myPos = transform.position
-        
-        // Calculate direction to player
+
         const dir = playerPos.getDirectionVector(myPos)
         const angle = Math.atan2(dir.y, dir.x)
-        
+
         transform.setRotation(angle)
-        
+
         return BehaviorTree.SUCCEEDED
     }
 }
@@ -240,4 +204,22 @@ class BTMoveDown extends BTNode {
         transform.position = pos
         return BehaviorTree.SUCCEEDED
     }
+}
+
+// Sets the specific bounds for each shape (enemy).
+// Generalized to work with weird shapes (blue enemies), otherwise defaults to use the enemy's radius (or zero if radius is missing)
+function setShapeBounds(controller) {
+    let shapeBounds
+    if (controller.shapeBounds) {
+        shapeBounds = controller.shapeBounds
+    } else {
+        const radius = controller.radius || 0
+        shapeBounds = {
+            left: -radius,
+            right: radius,
+            top: -radius,
+            bot: radius
+        }
+    }
+    return shapeBounds
 }
