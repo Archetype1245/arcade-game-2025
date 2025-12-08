@@ -54,6 +54,6 @@ class GameScene extends Scene {
 
         this.activeCamera = cam.getComponent(Camera2D)
 
-        GameGlobals.score = 0
+        GameGlobals.score = 100000
     }
 }

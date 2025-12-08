@@ -81,7 +81,7 @@ const EnemyDefs = {
     SmallEnemy: {
         type: Config.enemyTypes.small,
         beamColor: null,
-        speed: 300,
+        speed: 275,
 
         cost: 0,
         weight: 0,

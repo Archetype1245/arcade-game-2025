@@ -21,8 +21,8 @@ class TrailController extends Component {
 
     _polygon = null
     _polyPoints = []                              // Reusable array for polygon vertices
-    _gradientStart = { x: 0, y: 0 }
-    _gradientEnd = { x: 0, y: 0 }
+    _gradientStart = Vector2.zero
+    _gradientEnd = Vector2.zero
     _alphaStart = 0
     _alphaEnd = 0
 
@@ -40,6 +40,12 @@ class TrailController extends Component {
         for (let i = 0; i < this.maxPoints * 2; i++) {
             this._polyPoints[i] = Vector2.zero
         }
+
+        // Create initial arrays for reuse
+        this._px = new Array(this.maxPoints)
+        this._py = new Array(this.maxPoints)
+        this._w  = new Array(this.maxPoints)
+        this._a  = new Array(this.maxPoints)
 
         this._polygon = this.gameObject.addComponent(new Polygon(), {
             hidden: true,
@@ -98,11 +104,11 @@ class TrailController extends Component {
         const now = Time.time
         const idx = (k) => MathUtils.mod(this._head - N + k, this.maxPoints)
 
-        // Build arrays of positions, widths, and alphas
-        const px = new Array(N)
-        const py = new Array(N)
-        const w = new Array(N)
-        const a = new Array(N)
+        // Reuse the existing arrays each update
+        const px = this._px
+        const py = this._py
+        const w  = this._w
+        const a  = this._a
 
         for (let i = 0; i < N; i++) {
             const p = this._points[idx(i)]
@@ -110,26 +116,24 @@ class TrailController extends Component {
             py[i] = p.pos.y
 
             const age = (now - p.time) / this.duration
-            const t = Math.max(0, 1 - age) // 1=newest → 0=oldest
+            const t = Math.max(0, 1 - age)
             w[i] = this.widthStart * t + this.widthEnd * (1 - t)
             a[i] = (this.alphaStart * t + this.alphaEnd * (1 - t)) * this.color.a
         }
 
-        const left = new Array(N)
-        const right = new Array(N)
-
         for (let i = 0; i < N; i++) {
+            let nx = 0
+            let ny = 0
+            let m = 1
             if (i === 0 || i === N - 1) {
-                // Endpoints: use the single segment normal
                 const j = (i === 0) ? 1 : i
                 const dx = px[j] - px[j - 1]
                 const dy = py[j] - py[j - 1]
                 const len = Math.hypot(dx, dy) || 1
-                const nx = -dy / len
-                const ny = dx / len
-                this._addLR(left, right, i, px[i], py[i], nx, ny, w[i], 1)
+                nx = -dy / len
+                ny = dx / len
+                m = 1
             } else {
-                // Interior: miter between prev and next segment normals
                 const dx0 = px[i] - px[i - 1]
                 const dy0 = py[i] - py[i - 1]
                 const dx1 = px[i + 1] - px[i]
@@ -142,47 +146,29 @@ class TrailController extends Component {
                 const n1x = -dy1 / l1
                 const n1y = dx1 / l1
 
-                // Averaged (bisector) normal
-                let mx = n0x + n1x
-                let my = n0y + n1y
-                let ml = Math.hypot(mx, my)
+                nx = n0x + n1x
+                ny = n0y + n1y
+                let nLen = Math.hypot(nx, ny)
 
-                if (ml < MathUtils.EPS) {
-                    // 180° flip; fall back to next normal
-                    mx = n1x
-                    my = n1y
-                    ml = 1
+                if (nLen < MathUtils.EPS) {
+                    // 180° flip - fall back to next normal
+                    nx = n1x
+                    ny = n1y
+                    nLen = 1
                 } else {
-                    mx /= ml
-                    my /= ml
+                    nx /= nLen
+                    ny /= nLen
                 }
 
-                const denom = mx * n1x + my * n1y
-                let m = 1 / Math.max(denom, MathUtils.EPS)
+                const denom = nx * n1x + ny * n1y
+                m = 1 / Math.max(denom, MathUtils.EPS)
                 if (m > TrailController.MITER_LIMIT) m = TrailController.MITER_LIMIT
-
-                this._addLR(left, right, i, px[i], py[i], mx, my, w[i], m)
-                // this._addLRToPoly(i, px[i], py[i], nx, ny, w[i], m, N)
             }
+            this._addLRToPoly(i, px[i], py[i], nx, ny, w[i], m, N)
         }
-
-        // Build polygon points - left side forward, right side backward
-        const polyPoints = this._polyPoints
-        const totalPoints = N * 2
-
-        for (let i = 0; i < N; i++) {
-            polyPoints[i].x = left[i].x
-            polyPoints[i].y = left[i].y
-        }
-        for (let i = 0; i < N; i++) {
-            polyPoints[N + i].x = right[N - 1 - i].x
-            polyPoints[N + i].y = right[N - 1 - i].y
-        }
-
-        // this._polygon.points = this._polyPoints.slice(0, 2 * N)
 
         // Set polygon points (slice to actual used length)
-        this._polygon.points = polyPoints.slice(0, totalPoints)
+        this._polygon.points = this._polyPoints.slice(0, 2 * N)
         this._polygon.markDirty()
 
         // Store gradient parameters for the fillStyle function
@@ -194,20 +180,12 @@ class TrailController extends Component {
         this._alphaEnd = a[N - 1]
     }
 
-    _addLR(left, right, i, px, py, nx, ny, wi, m) {
+    _addLRToPoly(i, px, py, nx, ny, wi, m, N) {
         const off = 0.5 * wi * m
-        const ox = nx * off
-        const oy = ny * off
-        left[i] = { x: px + ox, y: py + oy }
-        right[i] = { x: px - ox, y: py - oy }
+        const ox = nx * off, oy = ny * off
+        this._polyPoints[i].setVec(px + ox, py + oy)                // left side forward
+        this._polyPoints[2 * N - 1 - i].setVec(px - ox, py - oy)    // right side backward
     }
-
-    // _addLRToPoly(i, px, py, nx, ny, wi, m, N) {
-    //     const off = 0.5 * wi * m
-    //     const ox = nx * off, oy = ny * off
-    //     this._polyPoints[i].setVec(px + ox, py + oy)                // left forward
-    //     this._polyPoints[2 * N - 1 - i].setVec(px - ox, py - oy)    // right backward
-    // }
 
     _createGradient(ctx) {
         const g = ctx.createLinearGradient(

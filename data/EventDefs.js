@@ -21,8 +21,8 @@ const EventDefs = {
 
         params: {
             enemyId: "BlueEnemy",
-            perCorner: 20,
-            duration: 5,
+            perCorner: 15,
+            duration: 6,
             corners: corners,
         },
     },
@@ -39,8 +39,8 @@ const EventDefs = {
 
         params: {
             enemyId: "GreenEnemy",
-            perCorner: 20,
-            duration: 5,
+            perCorner: 15,
+            duration: 6,
             corners: corners,
         },
     },
@@ -57,8 +57,8 @@ const EventDefs = {
 
         params: {
             enemyId: "PinkEnemy",
-            perCorner: 20,
-            duration: 5,
+            perCorner: 15,
+            duration: 6,
             corners: corners,
         },
     },

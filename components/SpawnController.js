@@ -3,7 +3,7 @@ class SpawnController extends Component {
         super()
 
         // Initial values currently tuned for testing various things - TODO: adjust for normal gameplay when done
-        this.intensity = 7
+        this.intensity = 500
 
         this.timeSinceEnemySpawn = IntensityConfig.spawnIntervalMax
         this.timeSinceEventCheck = 8
@@ -42,9 +42,10 @@ class SpawnController extends Component {
 
         if (this.timeSinceEventCheck >= IntensityConfig.eventCheckInterval) {
             // const event = EventDefs.blue_corner_rain
-            const event = EventDefs.blue_ring_burst
-            EventScriptRunner.runScript(event.scriptId, this, event)
+            // const event = EventDefs.blue_ring_burst
+            // EventScriptRunner.runScript(event.scriptId, this, event)
 
+            this.checkAndSpawnEvent()
             this.timeSinceEventCheck = 0
         }
 
@@ -170,7 +171,7 @@ class SpawnController extends Component {
                 eligibleEvents.push(event)
             }
         }
-
+        
         if (eligibleEvents.length === 0) {
             return
         }
