@@ -35,18 +35,21 @@
     <script src="../engine/Mat2D.js"></script>
     <script src="../engine/MathUtils.js"></script>
     <script src="../engine/SpatialMap.js"></script>
+    <script src="../engine/Events.js"></script>
 
     <script src="../engine/components/Transform.js"></script>
     <script src="../engine/components/Camera2D.js"></script>
     <script src="../engine/components/Collider.js"></script>
     <script src="../engine/components/RigidBody.js"></script>
     <script src="../engine/components/Polygon.js"></script>
+    <script src="../engine/components/LineBatch.js"></script>
     <script src="../engine/components/PolygonCollider.js"></script>
     <script src="../engine/components/SweptCircle.js"></script>
     <script src="../engine/components/Circle.js"></script>
     <script src="../engine/components/Deform.js"></script>
     <script src="../engine/components/Text.js"></script>
     <script src="../engine/components/BehaviorTree.js"></script>
+    <script src="../engine/components/RenderTarget2D.js"></script>
 
     <!-- Game -->
     <script src="./data/Config.js"></script>
@@ -82,6 +85,7 @@
     <script src="./prefabs/BlueEnemyGameObject.js"></script>
     <script src="./prefabs/GreenEnemyGameObject.js"></script>
     <script src="./prefabs/PinkEnemyGameObject.js"></script>
+    <script src="./prefabs/SmallEnemyGameObject.js"></script>
     <script src="./prefabs/LightBeamGameObject.js"></script>
     <script src="./prefabs/DebugGameObject.js"></script>
     <script src="./prefabs/SpawnManagerGameObject.js"></script>
@@ -95,6 +99,7 @@
     <!-- Game Mode Components -->
     <script src="./components/PlayerController.js"></script>
     <script src="./components/FollowTargetController.js"></script>
+    <script src="./components/TrailController.js"></script>
     <script src="./components/UIDisplayController.js"></script>
     <script src="./components/LaserController.js"></script>
     <script src="./components/DebugController.js"></script>
@@ -109,11 +114,13 @@
     <script src="./ai/BlueEnemyBehavior.js"></script>
     <script src="./ai/GreenEnemyBehavior.js"></script>
     <script src="./ai/PinkEnemyBehavior.js"></script>
+    <script src="./ai/SmallEnemyBehavior.js"></script>
 
     <script src="./components/Enemies/PurpleEnemyController.js"></script>
     <script src="./components/Enemies/BlueEnemyController.js"></script>
     <script src="./components/Enemies/GreenEnemyController.js"></script>
     <script src="./components/Enemies/PinkEnemyController.js"></script>
+    <script src="./components/Enemies/SmallEnemyController.js"></script>
 
     <script>
         SceneManager.loadScene(new MainMenuScene())

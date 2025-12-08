@@ -1,221 +1,257 @@
 class SpawnController extends Component {
-	constructor() {
-		super()
+    constructor() {
+        super()
 
-		// Initial values currently tuned for testing various things - TODO: adjust for normal gameplay when done
-		this.intensity = 7
+        // Initial values currently tuned for testing various things - TODO: adjust for normal gameplay when done
+        this.intensity = 7
 
-		this.timeSinceEnemySpawn = IntensityConfig.spawnIntervalMax
-		this.timeSinceEventCheck = 8
+        this.timeSinceEnemySpawn = IntensityConfig.spawnIntervalMax
+        this.timeSinceEventCheck = 8
 
-		this.eventCooldowns = {}
-		for (const eventId in EventDefs) {
-			this.eventCooldowns[eventId] = 0
-		}
-	}
+        this.eventCooldowns = {}
+        for (const eventId in EventDefs) {
+            this.eventCooldowns[eventId] = 0
+        }
+    }
 
-	start() {
-		this.player = GameObject.getObjectByName("PlayerGameObject")
-		this.screenDiag = Math.hypot(Engine.canvas.width / 2, Engine.canvas.height / 2)
-	}
+    start() {
+        this.player = GameObject.getObjectByName("PlayerGameObject")
+        this.screenDiag = Math.hypot(Engine.canvas.width / 2, Engine.canvas.height / 2)
 
-	update(dt) {
-		this.updateIntensity(dt);
+        // Listen for enemy deaths to handle pink enemy splits
+        Events.addEventListener("EnemyDeath", (data) => {
+            if (data.enemyDef.type === Config.enemyTypes.pink) {
+                this.handlePinkEnemySplit(data)
+            }
+        })
+    }
 
-		this.timeSinceEnemySpawn += dt
-		this.timeSinceEventCheck += dt
+    update(dt) {
+        this.updateIntensity(dt);
 
-		const currentSpawnInterval = this.getCurrentSpawnInterval()
+        this.timeSinceEnemySpawn += dt
+        this.timeSinceEventCheck += dt
 
-		for (const eventId in this.eventCooldowns) {
-			if (this.eventCooldowns[eventId] > 0) {
-				this.eventCooldowns[eventId] = Math.max(0, this.eventCooldowns[eventId] - dt)
-			}
-		}
+        const currentSpawnInterval = this.getCurrentSpawnInterval()
 
-		if (this.timeSinceEventCheck >= IntensityConfig.eventCheckInterval) {
-			// const event = EventDefs.blue_corner_rain
-			const event = EventDefs.blue_ring_burst
-			EventScriptRunner.runScript(event.scriptId, this, event)
+        for (const eventId in this.eventCooldowns) {
+            if (this.eventCooldowns[eventId] > 0) {
+                this.eventCooldowns[eventId] = Math.max(0, this.eventCooldowns[eventId] - dt)
+            }
+        }
 
-			this.timeSinceEventCheck = 0
-		}
+        if (this.timeSinceEventCheck >= IntensityConfig.eventCheckInterval) {
+            // const event = EventDefs.blue_corner_rain
+            const event = EventDefs.blue_ring_burst
+            EventScriptRunner.runScript(event.scriptId, this, event)
 
-		if (this.timeSinceEnemySpawn >= currentSpawnInterval) {
-			this.spawnEnemies()
-			this.timeSinceEnemySpawn = 0
-		}
-	}
+            this.timeSinceEventCheck = 0
+        }
 
-	updateIntensity(dt) {
-		const currentScore = GameGlobals.score || 0
+        if (this.timeSinceEnemySpawn >= currentSpawnInterval) {
+            this.spawnEnemies()
+            this.timeSinceEnemySpawn = 0
+        }
+    }
 
-		const baseGain = IntensityConfig.baseGainPerSecond * dt
-		const scoreGain = currentScore > 0 ? Math.pow(Math.log10(currentScore), 2) * dt : 0
+    updateIntensity(dt) {
+        const currentScore = GameGlobals.score || 0
 
-		this.intensity += Math.max(baseGain, scoreGain)
-		this.intensity = Math.min(this.intensity, IntensityConfig.maxIntensity)
-	}
+        const baseGain = IntensityConfig.baseGainPerSecond * dt
+        const scoreGain = currentScore > 0 ? Math.pow(Math.log10(currentScore), 2) * dt : 0
 
-	getCurrentSpawnInterval() {
-		const t = Math.min(1, this.intensity / IntensityConfig.spawnIntervalScaleIntensity)
-		return IntensityConfig.spawnIntervalMax -
-			(IntensityConfig.spawnIntervalMax - IntensityConfig.spawnIntervalMin) * t
-	}
+        this.intensity += Math.max(baseGain, scoreGain)
+        this.intensity = Math.min(this.intensity, IntensityConfig.maxIntensity)
+    }
 
-	getSpawnsPerTick() {
-		const t = Math.min(1, this.intensity / 100)
-		const range = IntensityConfig.maxSpawnsPerTick - IntensityConfig.minSpawnsPerTick
-		return Math.floor(IntensityConfig.minSpawnsPerTick + range * t)
-	}
+    getCurrentSpawnInterval() {
+        const t = Math.min(1, this.intensity / IntensityConfig.spawnIntervalScaleIntensity)
+        return IntensityConfig.spawnIntervalMax -
+            (IntensityConfig.spawnIntervalMax - IntensityConfig.spawnIntervalMin) * t
+    }
 
-	async spawn(enemy, pos) {
-		await LightBeam.triggerBeam(pos, {
-			color: enemy.beamColor,
-			length: this.screenDiag
-		})
+    getSpawnsPerTick() {
+        const t = Math.min(1, this.intensity / 100)
+        const range = IntensityConfig.maxSpawnsPerTick - IntensityConfig.minSpawnsPerTick
+        return Math.floor(IntensityConfig.minSpawnsPerTick + range * t)
+    }
 
-		// Create the appropriate enemy prefab based on type
-		let enemyGameObject
-		switch (enemy.type) {
-			case Config.enemyTypes.purple:
-				enemyGameObject = new PurpleEnemyGameObject(enemy)
-				break
-			case Config.enemyTypes.blue:
-				enemyGameObject = new BlueEnemyGameObject(enemy)
-				break
-			case Config.enemyTypes.green:
-				enemyGameObject = new GreenEnemyGameObject(enemy)
-				break
-			case Config.enemyTypes.pink:
-				enemyGameObject = new PinkEnemyGameObject(enemy)
-				break
-			default:
-				console.warn("Unknown enemy type:", enemy.type)
-				return
-		}
+    async spawn(enemy, pos) {
+        if (enemy.beamColor) {
+            await LightBeam.triggerBeam(pos, {
+                color: enemy.beamColor,
+                length: this.screenDiag
+            })
+        }
 
-		GameObject.instantiate(enemyGameObject, {
-			scene: SceneManager.currentScene,
-			layer: Config.layers.enemies,
-			position: pos
-		})
-	}
+        // Create the appropriate enemy prefab based on type
+        let enemyGameObject
+        switch (enemy.type) {
+            case Config.enemyTypes.purple:
+                enemyGameObject = new PurpleEnemyGameObject(enemy)
+                break
+            case Config.enemyTypes.blue:
+                enemyGameObject = new BlueEnemyGameObject(enemy)
+                break
+            case Config.enemyTypes.green:
+                enemyGameObject = new GreenEnemyGameObject(enemy)
+                break
+            case Config.enemyTypes.pink:
+                enemyGameObject = new PinkEnemyGameObject(enemy)
+                break
+            case Config.enemyTypes.small:
+                enemyGameObject = new SmallEnemyGameObject(enemy)
+                break
+            default:
+                console.warn("Unknown enemy type:", enemy.type)
+                return
+        }
 
-	spawnEnemies() {
-		let budget = this.intensity
-		const currentScore = GameGlobals.score || 0
+        GameObject.instantiate(enemyGameObject, {
+            scene: SceneManager.currentScene,
+            layer: Config.layers.enemies,
+            position: pos
+        })
+    }
 
-		const eligibleEnemies = []
-		for (const enemyId in EnemyDefs) {
-			const enemy = EnemyDefs[enemyId]
-			if (enemy.cost <= budget &&
-				this.intensity >= enemy.minIntensity &&
-				currentScore >= enemy.minScore) {
-				eligibleEnemies.push(enemy)
-			}
-		}
+    spawnEnemies() {
+        let budget = this.intensity
+        const currentScore = GameGlobals.score || 0
 
-		if (eligibleEnemies.length === 0) return
+        const eligibleEnemies = []
+        for (const enemyId in EnemyDefs) {
+            const enemy = EnemyDefs[enemyId]
+            if (enemy.cost <= budget &&
+                this.intensity >= enemy.minIntensity &&
+                currentScore >= enemy.minScore) {
+                eligibleEnemies.push(enemy)
+            }
+        }
 
-		const maxSpawnsThisTick = this.getSpawnsPerTick()
+        if (eligibleEnemies.length === 0) return
 
-		let spawnsThisTick = 0
-		while (spawnsThisTick < maxSpawnsThisTick && budget > 0) {
-			const affordableEnemies = eligibleEnemies.filter(e => e.cost <= budget)
-			if (affordableEnemies.length === 0) {
-				break
-			}
+        const maxSpawnsThisTick = this.getSpawnsPerTick()
 
-			const enemy = this.selectWeighted(affordableEnemies)
-			if (!enemy) {
-				break
-			}
+        let spawnsThisTick = 0
+        while (spawnsThisTick < maxSpawnsThisTick && budget > 0) {
+            const affordableEnemies = eligibleEnemies.filter(e => e.cost <= budget)
+            if (affordableEnemies.length === 0) {
+                break
+            }
 
-			budget -= enemy.cost
-			const position = this.generateSpawnPosition()
-			this.spawn(enemy, position)
+            const enemy = this.selectWeighted(affordableEnemies)
+            if (!enemy) {
+                break
+            }
 
-			spawnsThisTick++
-		}
+            budget -= enemy.cost
+            const position = this.generateSpawnPosition()
+            this.spawn(enemy, position)
 
-		this.intensity = budget
-	}
+            spawnsThisTick++
+        }
 
-	checkAndSpawnEvent() {
-		if (this.intensity < IntensityConfig.minIntensityForEvents) {
-			return
-		}
+        this.intensity = budget
+    }
 
-		const currentScore = GameGlobals.score || 0
+    checkAndSpawnEvent() {
+        if (this.intensity < IntensityConfig.minIntensityForEvents) {
+            return
+        }
 
-		const eligibleEvents = []
-		for (const eventId in EventDefs) {
-			const event = EventDefs[eventId]
-			if (this.intensity >= event.cost && this.intensity >= event.minIntensity &&
-				currentScore >= event.minScore && this.eventCooldowns[eventId] === 0) {
+        const currentScore = GameGlobals.score || 0
 
-				eligibleEvents.push(event)
-			}
-		}
+        const eligibleEvents = []
+        for (const eventId in EventDefs) {
+            const event = EventDefs[eventId]
+            if (this.intensity >= event.cost && this.intensity >= event.minIntensity &&
+                currentScore >= event.minScore && this.eventCooldowns[eventId] === 0) {
 
-		if (eligibleEvents.length === 0) {
-			return
-		}
+                eligibleEvents.push(event)
+            }
+        }
 
-		const event = this.selectWeighted(eligibleEvents)
-		if (!event) {
-			return
-		}
+        if (eligibleEvents.length === 0) {
+            return
+        }
 
-		this.intensity -= event.cost
-		this.eventCooldowns[event.id] = event.cooldown
-		EventScriptRunner.runScript(event.scriptId, this, event)
-	}
+        const event = this.selectWeighted(eligibleEvents)
+        if (!event) {
+            return
+        }
 
-	selectWeighted(items) {
-		if (items.length === 0) {
-			return null
-		}
+        this.intensity -= event.cost
+        this.eventCooldowns[event.id] = event.cooldown
+        EventScriptRunner.runScript(event.scriptId, this, event)
+    }
 
-		const totalWeight = items.reduce((sum, item) => sum + item.weight, 0)
-		if (totalWeight <= 0) {
-			return items[0]
-		}
+    selectWeighted(items) {
+        if (items.length === 0) {
+            return null
+        }
 
-		let random = Math.random() * totalWeight;
-		for (const item of items) {
-			random -= item.weight
-			if (random <= 0) {
-				return item
-			}
-		}
+        const totalWeight = items.reduce((sum, item) => sum + item.weight, 0)
+        if (totalWeight <= 0) {
+            return null
+        }
 
-		return items[items.length - 1]
-	}
+        let random = Math.random() * totalWeight;
+        for (const item of items) {
+            random -= item.weight
+            if (random <= 0) {
+                return item
+            }
+        }
 
-	generateSpawnPosition() {
-		const pp = this.player.transform.position
+        return items[items.length - 1]
+    }
 
-		const minRadius = 150
-		const maxRadius = this.screenDiag
-		const angle = Math.random() * Math.PI * 2
-		const distance = minRadius + Math.random() * (maxRadius - minRadius)
+    handlePinkEnemySplit(deathData) {
+        const { pos, shotAngle } = deathData
 
-		let x = pp.x + Math.cos(angle) * distance
-		let y = pp.y + Math.sin(angle) * distance
-		const spawnPos = this.ensureValidSpawnPosition(x, y)
-		
-		return spawnPos
-	}
+        for (let i = 0; i < 3; i++) {
+            // Random angle within (+-)π/2 of laser angle helps ensure player safety on enemy spawn
+            const angleOffset = (Math.random() - 0.5) * Math.PI
+            const spawnAngle = shotAngle + angleOffset
 
-	ensureValidSpawnPosition(x, y) {
-		const b = Config.playable
-		const inset = 25
+            const distance = 150 + Math.random() * 150   // 150-300
 
-		x = Math.min(Math.max(x, b.x1 + inset), b.x2 - inset)
-		y = Math.min(Math.max(y, b.y1 + inset), b.y2 - inset)
+            const x = pos.x + Math.cos(spawnAngle) * distance
+            const y = pos.y + Math.sin(spawnAngle) * distance
+            const spawnPos = this.ensureValidSpawnPosition(x, y)
 
-		return new Vector2(x, y)
-	}
+            this.spawn(EnemyDefs.SmallEnemy, spawnPos)
+
+            // GameObject.instantiate(new SmallEnemyGameObject(EnemyDefs.SmallEnemy), {
+            //     scene: SceneManager.currentScene,
+            //     layer: Config.layers.enemies,
+            //     position: spawnPos
+            // })
+        }
+    }
+
+    generateSpawnPosition() {
+        const pp = this.player.transform.position
+
+        const minRadius = 150
+        const maxRadius = this.screenDiag
+        const angle = Math.random() * Math.PI * 2
+        const distance = minRadius + Math.random() * (maxRadius - minRadius)
+
+        let x = pp.x + Math.cos(angle) * distance
+        let y = pp.y + Math.sin(angle) * distance
+        const spawnPos = this.ensureValidSpawnPosition(x, y)
+
+        return spawnPos
+    }
+
+    ensureValidSpawnPosition(x, y) {
+        const b = Config.playable
+        const inset = 25
+
+        x = Math.min(Math.max(x, b.x1 + inset), b.x2 - inset)
+        y = Math.min(Math.max(y, b.y1 + inset), b.y2 - inset)
+
+        return new Vector2(x, y)
+    }
 }

@@ -2,10 +2,18 @@ class MainMenuScene extends Scene {
     constructor() {
         super({
             collisionPairs: [],
-            trackedTags: ["bgDot"]
+            trackedTags: ["bgDot"],
+            layerDefs: [
+                { name:"background",    space: "world" },
+                { name:"grid",          space: "screen"},
+                { name:"dots",          space: "screen"},
+                { name:"carouselBack",  space: "world" },
+                { name:"projectorBeam", space: "world" },
+                { name:"carouselMid",   space: "world" },
+                { name:"carouselFront", space: "world" },
+                { name:"ui",            space: "screen"}
+            ]
         })
-        this.layerOrder = ["background", "grid", "dots", "carouselBack", "projectorBeam", "carouselMid", "carouselFront", "ui"]
-        this.initLayers()
 
         const viewW = 1600
         const viewH = viewW / Config.camera.aspect
@@ -38,15 +46,15 @@ class MainMenuScene extends Scene {
         })
 
         GameObject.instantiate(new GridBackgroundGameObject({
-                horizonRatio: 0.4,
-                fakeCamY: 16,
-                zNear: 1,
-                zFar: 80,
-                scrollSpeed: -1.5,
-            }), {
-                scene: this,
-                layer: "grid" 
-                }
+            horizonRatio: 0.4,
+            fakeCamY: 16,
+            zNear: 1,
+            zFar: 80,
+            scrollSpeed: -1.5,
+        }), {
+            scene: this,
+            layer: "grid"
+        }
         )
 
         const dotNetwork = new GameObject("DotNetworkGameObject")

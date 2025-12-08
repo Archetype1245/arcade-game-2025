@@ -1,29 +1,36 @@
-class PinkEnemyController extends Component {
+class SmallEnemyController extends Component {
     start() {
         this.player = GameObject.getObjectByName("PlayerGameObject")
-
-        this.size = 38
+        
+        this.size = 19
         this.radius = this.size
         this.transform.setScale(this.size)
-
-        this.speed = EnemyDefs.PinkEnemy.speed
-        this.period = 1.5
-
+        
+        this.orbitCenterPos = this.transform.position
+        this.currentOrbitRadius = 0
+        this.finalOrbitRadius = 100
+        this.orbitRadiusGrowthRate = 100
+        
+        this.orbitDirection = Math.random() < 0.5 ? -1 : 1
+        this.orbitSpeed = 7.5 // radians per second
+        this.orbitAngle = Math.random() * Math.PI * 2
+        
+        this.speed = this.gameObject.enemyDef.speed
+        
         this.defs = {
             left: new Vector2(-1, 0), right: new Vector2(1, 0),
             top: new Vector2(0, -1), bot: new Vector2(0, 1),
             tM: new Vector2(-0.05, -0.125),
             bM: new Vector2(0.05, 0.125)
         }
-
-        // Build polygons/paths/collision
+        
         this.gameObject.collider.points = [this.defs.left, this.defs.bot, this.defs.right, this.defs.top]
-
+        
         this.topLeftPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.top, this.defs.left, this.defs.tM],
             fillStyle: Config.colors.pinkHi,
         })
-
+        
         this.midShadePolys = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.defs.top, this.defs.tM, this.defs.right],
@@ -31,11 +38,12 @@ class PinkEnemyController extends Component {
             ],
             fillStyle: Config.colors.pinkBase,
         })
-
+        
         this.bottomRightPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.bot, this.defs.right, this.defs.tM],
             fillStyle: Config.colors.pinkLow,
         })
+        
         this.lowerLines = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.defs.left, this.defs.bM, this.defs.right],
@@ -43,9 +51,10 @@ class PinkEnemyController extends Component {
             ],
             strokeStyle: Config.colors.pinkBottomLines,
             closePath: false,
-            fill:false,
+            fill: false,
             lineWidth: 1
         })
+        
         this.upperLines = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.defs.left, this.defs.top, this.defs.right, this.defs.bot],
@@ -57,21 +66,30 @@ class PinkEnemyController extends Component {
             fill: false,
             lineWidth: 1
         })
-
+        
         this.polys = [this.gameObject.collider, this.lowerLines, this.upperLines, this.midShadePolys,
-                      this.topLeftPoly, /*this.topRightPoly, this.bottomLeftPoly*/, this.bottomRightPoly]
+                      this.topLeftPoly, this.bottomRightPoly]
     }
-
+    
     update() {
-        const p = this.player.transform.position
-        const t = this.transform.position
+        const dt = Time.deltaTime
         
-        const dir = p.getDirectionVector(t)
-        const r = Math.atan2(dir.y, dir.x)  // Angle to make the enemy "face" the player
+        if (this.currentOrbitRadius < this.finalOrbitRadius) {
+            this.currentOrbitRadius += this.orbitRadiusGrowthRate * dt
+            this.currentOrbitRadius = Math.min(this.currentOrbitRadius, this.finalOrbitRadius)
+        }
         
-        const wobble = (Math.PI / 6) * (Math.sin((2 * Math.PI / this.period) * Time.time))  // Oscillation between +- 30 degrees
-        this.transform.setRotation(r + wobble)  // Enemy turns to "face" the player but always has the oscillation
+        this.orbitAngle += this.orbitSpeed * this.orbitDirection * dt
         
+        const offsetX = Math.cos(this.orbitAngle) * this.currentOrbitRadius
+        const offsetY = Math.sin(this.orbitAngle) * this.currentOrbitRadius
+        
+        this.transform.position = new Vector2(
+            this.orbitCenterPos.x + offsetX,
+            this.orbitCenterPos.y + offsetY
+        )
+
+        // Update visual polygons
         this.polys.forEach(p => p.markDirty())
     }
 }

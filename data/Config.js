@@ -20,10 +20,11 @@ class Config {
     }
     
     static enemyTypes = {
-        purple: 1<<0,
-        blue:   1<<1,
-        green:  1<<2,
-        pink:   1<<3
+        purple: 0,
+        blue:   1,
+        green:  2,
+        pink:   3,
+        small:  4
     }
 
     static colors = {

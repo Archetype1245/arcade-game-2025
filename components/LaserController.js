@@ -31,6 +31,22 @@ class LaserController extends Component {
             points: [this.def.tL, this.def.bL, this.def.tip],
             fillStyle: "#e8ca75ff",
         })
+
+        // Spawn once, behind the laser
+        if (!this.gameObject.trailGO) {
+            const trailGO = new GameObject("LaserTrailGameObject")
+            this.gameObject.trailGO = trailGO;
+
+            const trail = trailGO.addComponent(new TrailController(), {
+                ...TrailController.presets.laser,
+                target: this.gameObject
+            });
+
+            GameObject.instantiate(trailGO, {
+                layer: "trails",
+                forceStart: true
+            })
+        }
     }
 
     update() {
@@ -40,19 +56,24 @@ class LaserController extends Component {
 
         if (this.transform.position.x < this.bounds.x1 || this.transform.position.x > this.bounds.x2 ||
             this.transform.position.y < this.bounds.y1 || this.transform.position.y > this.bounds.y2) {
+
             this.gameObject.destroy()
+            if (this.gameObject.trailGO) {
+                this.gameObject.trailGO.destroy()
+            }
         }
     }
 
     onCollisionEnter(other) {
         if (other instanceof BaseEnemyGameObject) {
-            const enemyDef = other.enemyDef
-
-            if (enemyDef && enemyDef.scoreValue) {
-                GameGlobals.score += enemyDef.scoreValue
-            }
+            Events.fireEvent("EnemyDeath", {
+                enemyDef: other.enemyDef,
+                pos: other.transform.position,
+                shotAngle: this.angle
+            })
 
             this.gameObject.destroy()
+            if (this.gameObject.trailGO) this.gameObject.trailGO.destroy()
             other.destroy()
         }
     }
