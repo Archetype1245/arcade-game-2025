@@ -4,7 +4,7 @@ class LaserController extends Component {
         this.angle = a
     }
     start() {
-        this.speed = Config.speed.bullets
+        this.speed = Config.Lasers.speed
         this.velocity = Vector2.zero
         this.sizeTip = 20
         this.sizeBase = 8
@@ -15,10 +15,10 @@ class LaserController extends Component {
         this.sin = Math.sin(this.transform.rotation)
 
         this.bounds = {
-            x1: Config.playable.x1 + this.sizeTip / 2,
-            x2: Config.playable.x2 - this.sizeTip / 2,
-            y1: Config.playable.y1 + this.sizeTip / 2,
-            y2: Config.playable.y2 - this.sizeTip / 2,
+            x1: Config.Playable.x1 + this.sizeTip / 2,
+            x2: Config.Playable.x2 - this.sizeTip / 2,
+            y1: Config.Playable.y1 + this.sizeTip / 2,
+            y2: Config.Playable.y2 - this.sizeTip / 2,
         }
 
         this.def = {
@@ -37,14 +37,13 @@ class LaserController extends Component {
             const trailGO = new GameObject("LaserTrailGameObject")
             this.gameObject.trailGO = trailGO;
 
-            const trail = trailGO.addComponent(new TrailController(), {
-                ...TrailController.presets.laser,
+            trailGO.addComponent(new TrailController(), {
+                ...Config.TrailPresets.laser,
                 target: this.gameObject
             });
 
             GameObject.instantiate(trailGO, {
-                layer: "trails",
-                forceStart: true
+                layer: "trails"
             })
         }
     }
@@ -66,7 +65,7 @@ class LaserController extends Component {
 
     onCollisionEnter(other) {
         if (other instanceof BaseEnemyGameObject) {
-            Events.fireEvent("EnemyDeath", {
+            Events.fireEvent("EnemyKilled", {
                 enemyDef: other.enemyDef,
                 pos: other.transform.position,
                 shotAngle: this.angle

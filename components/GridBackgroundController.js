@@ -1,5 +1,8 @@
 class GridBackgroundController extends Component {
     constructor({
+        designWidth = 1920,
+        designHeight = 1080,
+
         horizonRatio = 0.4,
         fakeCamY = 16,
         scaleX = 400,
@@ -16,6 +19,9 @@ class GridBackgroundController extends Component {
         scrollSpeed = -5
     } = {}) {
         super()
+
+        this.designWidth = designWidth
+        this.designHeight = designHeight
 
         this.horizonRatio = horizonRatio
         this.fakeCamY = fakeCamY
@@ -39,12 +45,13 @@ class GridBackgroundController extends Component {
         this.scrollSpeed = scrollSpeed
 
         this._scroll = 0
-        this._centerX = 0
-        this._horizonY = 0
-        this._canvasHeight = 0
+
+        this._centerX = this.designWidth * 0.5
+        this._horizonY = this.designHeight * this.horizonRatio
+        this._designHeight = this.designHeight
+
         this._floorFarY = 0
 
-        // Shape component references
         this.floorPolygon = null
         this.curvedBackPolygon = null
         this.verticalLines = null
@@ -52,27 +59,31 @@ class GridBackgroundController extends Component {
     }
 
     start() {
-        // Create floor polygon (trapezoid from zNear to zHorizon)
+        this._centerX = this.designWidth * 0.5
+        this._horizonY = this.designHeight * this.horizonRatio
+        this._designHeight = this.designHeight
+
+        // Floor Polygon
         this.floorPolygon = new Polygon()
         this.floorPolygon.name = "FloorPolygon"
         this.floorPolygon.strokeStyle = null
         this.gameObject.addComponent(this.floorPolygon)
 
-        // Create curved back polygon (zHorizon to zFar)
+        // Curved (back) Polygon
         this.curvedBackPolygon = new Polygon()
         this.curvedBackPolygon.name = "CurvedBackPolygon"
         this.curvedBackPolygon.fillStyle = `rgb(${this.farColor.r}, ${this.farColor.g}, ${this.farColor.b})`
         this.curvedBackPolygon.strokeStyle = null
         this.gameObject.addComponent(this.curvedBackPolygon)
 
-        // Create vertical lines (batched with shared gradient)
+        // Vertical Lines (batched since same gradient for all)
         this.verticalLines = new LineBatch()
         this.verticalLines.name = "VerticalLines"
         this.verticalLines.batched = true
         this.verticalLines.lineWidth = 2
         this.gameObject.addComponent(this.verticalLines)
 
-        // Create horizontal lines (per-line mode for fading)
+        // Horizontal Lines (not batched since each has unique color)
         this.horizontalLines = new LineBatch()
         this.horizontalLines.name = "HorizontalLines"
         this.horizontalLines.batched = false
@@ -80,46 +91,41 @@ class GridBackgroundController extends Component {
         this.gameObject.addComponent(this.horizontalLines)
 
         this._setupStyles()
+
+        this._updateFloorGeometry()
+        this._updateCurvedBackGeometry()
+        this._updateVerticalLines()
     }
 
     _setupStyles() {
-        // Floor: vertical gradient from canvasHeight to floorFarY
-        // Transition from nearColor to farColor completes around zHorizon/3
+        // Floor goes from designHeight to floorFarY
         this.floorPolygon.fillStyle = (ctx) => {
             const zFadeEnd = this.zHorizon / 3
             const fadeEndY = this._projectPointFlat(0, zFadeEnd).y
 
-            // Gradient from bottom of canvas to top of floor polygon
-            const y0 = this._canvasHeight
+            const y0 = this._designHeight
             const y1 = this._floorFarY
 
             const grad = ctx.createLinearGradient(0, y0, 0, y1)
 
-            // At y0 (canvas bottom): near color
             grad.addColorStop(0, `rgb(${this.nearColor.r}, ${this.nearColor.g}, ${this.nearColor.b})`)
 
-            // Calculate where fadeEnd falls as a normalized stop
             const fadeRatio = MathUtils.clamp01((y0 - fadeEndY) / (y0 - y1))
-
-            // At fadeRatio: far color (transition complete)
             grad.addColorStop(fadeRatio, `rgb(${this.farColor.r}, ${this.farColor.g}, ${this.farColor.b})`)
-
-            // At y1 (floor far edge): still far color
             grad.addColorStop(1, `rgb(${this.farColor.r}, ${this.farColor.g}, ${this.farColor.b})`)
 
             return grad
         }
 
-        // Vertical lines: screen-space vertical gradient
         this.verticalLines.strokeStyle = (ctx) => {
-            const grad = ctx.createLinearGradient(0, this._canvasHeight, 0, this._horizonY)
+            const grad = ctx.createLinearGradient(0, this._designHeight, 0, this._horizonY)
             grad.addColorStop(0.0, `rgba(200, 255, 255, 1)`)
             grad.addColorStop(0.5, `rgba(100, 127, 127, 0.5)`)
             grad.addColorStop(0.675, `rgba(0, 25, 40, 0)`)
             return grad
         }
 
-        // Horizontal lines: per-line alpha based on z depth
+        // Horizontal lines have their alpha based on z depth
         this.horizontalLines.strokeStyle = (ctx, seg, i) => {
             const alpha = this._lineAlphaForZ(seg.data.z)
             return `rgba(200, 255, 255, ${alpha})`
@@ -129,24 +135,15 @@ class GridBackgroundController extends Component {
     update() {
         this._scroll += this.scrollSpeed * Time.deltaTime
 
-        // Compute layout parameters from canvas dimensions
-        const w = Engine.canvas.width
-        const h = Engine.canvas.height
-        this._centerX = w * 0.5
-        this._horizonY = h * this.horizonRatio
-        this._canvasHeight = h
-
         let scrollOffset = this._scroll % this.cellSizeZ
         if (scrollOffset < 0) scrollOffset += this.cellSizeZ
 
-        // Update geometry for all shape components
-        this._updateFloorGeometry()
-        this._updateCurvedBackGeometry()
-        this._updateVerticalLinesGeometry()
-        this._updateHorizontalLinesGeometry(scrollOffset)
+        // Only horizontal lines need per-frame updates (due to their scrolling)
+        this._updateHorizontalLines(scrollOffset)
     }
 
     _projectPointFlat(x, z) {
+        // Apply perspective-based projection
         if (Math.abs(z) < MathUtils.EPS) z += MathUtils.EPS
         const invZ = 1 / z
 
@@ -161,11 +158,12 @@ class GridBackgroundController extends Component {
         let sx = p.x
         let sy = p.y
 
+        // How much the depth should distort the perspective past the "horizon"
         const depthFactor = MathUtils.clamp01((z - this.zHorizon) / (this.zFar - this.zHorizon))
         const depthPower = 2
         const f = Math.pow(depthFactor, depthPower)
 
-        const maxBendPixels = this._canvasHeight * 0.5
+        const maxBendPixels = this._designHeight * 0.5
         const bend = maxBendPixels * f
 
         sy -= bend
@@ -187,7 +185,6 @@ class GridBackgroundController extends Component {
         this.floorPolygon.points = [nearLeft, nearRight, farRight, farLeft]
         this.floorPolygon.markDirty()
 
-        // Store for gradient computation (projected Y at zHorizon)
         this._floorFarY = farLeft.y
     }
 
@@ -217,7 +214,7 @@ class GridBackgroundController extends Component {
         this.curvedBackPolygon.markDirty()
     }
 
-    _updateVerticalLinesGeometry() {
+    _updateVerticalLines() {
         const segments = []
 
         for (let i = 0; i <= this.cellsPerRow; i++) {
@@ -232,7 +229,7 @@ class GridBackgroundController extends Component {
         this.verticalLines.markDirty()
     }
 
-    _updateHorizontalLinesGeometry(scrollOffset) {
+    _updateHorizontalLines(scrollOffset) {
         const segments = []
         const maxRow = Math.min(20, this.cellsInDepth)
 
@@ -251,3 +248,4 @@ class GridBackgroundController extends Component {
         this.horizontalLines.markDirty()
     }
 }
+

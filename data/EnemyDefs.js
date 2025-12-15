@@ -1,7 +1,8 @@
 const EnemyDefs = {
     PurpleEnemy: {
-        type: Config.enemyTypes.purple,
-        beamColor: Config.beamColors.purpleBeam,
+        key: "PurpleEnemy",
+        type: Config.EnemyTypes.purple,
+        beamColor: Config.BeamColors.purpleBeam,
         speed: 200,
 
         cost: 4,
@@ -18,8 +19,9 @@ const EnemyDefs = {
     },
 
     BlueEnemy: {
-        type: Config.enemyTypes.blue,
-        beamColor: Config.beamColors.lightBlueBeam,
+        key: "BlueEnemy",
+        type: Config.EnemyTypes.blue,
+        beamColor: Config.BeamColors.lightBlueBeam,
         speed: 350,
 
         cost: 8,
@@ -36,8 +38,9 @@ const EnemyDefs = {
     },
 
     GreenEnemy: {
-        type: Config.enemyTypes.green,
-        beamColor: Config.beamColors.greenBeam,
+        key: "GreenEnemy",
+        type: Config.EnemyTypes.green,
+        beamColor: Config.BeamColors.greenBeam,
         speed: 400,
 
         cost: 12,
@@ -54,8 +57,9 @@ const EnemyDefs = {
     },
 
     PinkEnemy: {
-        type: Config.enemyTypes.pink,
-        beamColor: Config.beamColors.pinkBeam,
+        key: "PinkEnemy",
+        type: Config.EnemyTypes.pink,
+        beamColor: Config.BeamColors.pinkBeam,
         speed: 425,
 
         cost: 12,
@@ -70,16 +74,17 @@ const EnemyDefs = {
             count: 24
         },
 
-        deathSpawns: [{
-            type: Config.enemyTypes.small,
+        deathSpawns: {
+            type: "SmallEnemy",
             count: 2
-        }]
+        }
 
 
     },
 
     SmallEnemy: {
-        type: Config.enemyTypes.small,
+        key: "SmallEnemy",
+        type: Config.EnemyTypes.small,
         beamColor: null,
         speed: 275,
 

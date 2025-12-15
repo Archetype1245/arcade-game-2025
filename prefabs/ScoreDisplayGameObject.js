@@ -1,9 +1,12 @@
-class UIDisplayGameObject extends GameObject {
+class ScoreDisplayGameObject extends GameObject {
     constructor() {
-        super("UIDisplayGameObject")
-        this.addComponent(new Text(), {
+        super("ScoreDisplayGameObject")
+
+        this.scoreText = this.addComponent(new Text(), {
             text: `SCORE: ${GameGlobals.score}`,
-            font: "bold 24px Arial, sans-serif",
+            font: "bold 36px Arial, sans-serif",
+            textAlign: "left",
+            textBaseline: "top",
             fillStyle: "rgba(200, 240, 255, 1)",
             glow: true,
             glowConfig: {
@@ -16,8 +19,6 @@ class UIDisplayGameObject extends GameObject {
             }
         })
 
-        this.addComponent(new UIDisplayController())
-
-        this.transform.position = new Vector2(100, 50)
+        this.addComponent(new ScoreDisplayController(this.scoreText))
     }
 }

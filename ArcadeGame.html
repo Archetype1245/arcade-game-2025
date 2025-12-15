@@ -39,12 +39,13 @@
 
     <script src="../engine/components/Transform.js"></script>
     <script src="../engine/components/Camera2D.js"></script>
-    <script src="../engine/components/Collider.js"></script>
     <script src="../engine/components/RigidBody.js"></script>
     <script src="../engine/components/Polygon.js"></script>
+    <script src="../engine/components/QuadBatch.js"></script>
     <script src="../engine/components/LineBatch.js"></script>
     <script src="../engine/components/PolygonCollider.js"></script>
     <script src="../engine/components/SweptCircle.js"></script>
+    <script src="../engine/components/ParticleSystem.js"></script>
     <script src="../engine/components/Circle.js"></script>
     <script src="../engine/components/Deform.js"></script>
     <script src="../engine/components/Text.js"></script>
@@ -58,9 +59,11 @@
     <script src="./data/IntensityConfig.js"></script>
     <script src="./data/EnemyDefs.js"></script>
     <script src="./data/EventDefs.js"></script>
+    <script src="./data/ParticlePresets.js"></script>
 
     <script src="./utils/EventScriptRunner.js"></script>
-
+    <script src="./utils/UIScale.js"></script>
+    
     <script src="./scenes/MainMenuScene.js"></script>
     <script src="./scenes/GameScene.js"></script>
     <!-- Main Menu GOs -->
@@ -77,7 +80,7 @@
     <script src="./prefabs/BackgroundDotGameObject.js"></script>
     <!-- Game Mode GOs -->
     <script src="./prefabs/PlayableAreaGameObject.js"></script>
-    <script src="./prefabs/UIDisplayGameObject.js"></script>
+    <script src="./prefabs/DistortionGridGameObject.js"></script>
     <script src="./prefabs/PlayerGameObject.js"></script>
     <script src="./prefabs/LaserGameObject.js"></script>
     <script src="./prefabs/BaseEnemyGameObject.js"></script>
@@ -86,7 +89,9 @@
     <script src="./prefabs/GreenEnemyGameObject.js"></script>
     <script src="./prefabs/PinkEnemyGameObject.js"></script>
     <script src="./prefabs/SmallEnemyGameObject.js"></script>
-    <script src="./prefabs/LightBeamGameObject.js"></script>
+    <script src="./prefabs/GameHUDGameObject.js"></script>
+    <script src="./prefabs/ScoreDisplayGameObject.js"></script>
+    <script src="./prefabs/LivesDisplayGameObject.js"></script>
     <script src="./prefabs/DebugGameObject.js"></script>
     <script src="./prefabs/SpawnManagerGameObject.js"></script>
     <!-- Main Menu Components -->
@@ -97,16 +102,28 @@
     <script src="./components/DotNetworkController.js"></script>
     <script src="./components/BackgroundDotController.js"></script>
     <!-- Game Mode Components -->
+    <script src="./components/GameFlowController.js"></script>
+    <script src="./components/PauseHotkeyController.js"></script>
+    <script src="./components/PauseMenuController.js"></script>
+    <script src="./components/GameOverMenuController.js"></script>
+    <script src="./components/PauseBackdropController.js"></script>
+    <script src="./components/SelectorLineController.js"></script>
+    <script src="./components/DistortionGridController.js"></script>
     <script src="./components/PlayerController.js"></script>
     <script src="./components/FollowTargetController.js"></script>
     <script src="./components/TrailController.js"></script>
-    <script src="./components/UIDisplayController.js"></script>
+    <script src="./components/ShieldController.js"></script>
+    <script src="./components/EnemyDeathFXController.js"></script>
+    <script src="./components/UIRootController.js"></script>
+    <script src="./components/ScoreDisplayController.js"></script>
+    <script src="./components/LivesDisplayController.js"></script>
     <script src="./components/LaserController.js"></script>
     <script src="./components/DebugController.js"></script>
     <script src="./components/LightBeamController.js"></script>
     <script src="./components/SpawnController.js"></script>
     <script src="./components/RingEventController.js"></script>
     <script src="./components/CornerEventController.js"></script>
+    <script src="./components/SeparationController.js"></script>
 
     <!-- AI Behavior Trees -->
     <script src="./ai/GenericBehavior.js"></script>

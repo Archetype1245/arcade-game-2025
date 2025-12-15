@@ -2,11 +2,11 @@ class CarouselController extends Component {
     constructor() {
         super()
         this.menuItems = [
-            { text: "Game Mode 1",  action: "startGame" },
-            { text: "Game Mode 2",  action: "gameMode2" },
-            { text: "Settings",     action: "settings" },
-            { text: "Leaderboards", action: "leaderboards" },
-            { text: "Quit Game",    action: "quit" }
+            { text: "Arcade Mode",   action: "startGame", iconType: "ship" },
+            { text: "Settings",      action: "settings", iconType: "settings" },
+            { text: "Pacifism Mode", action: "startPacifism", iconType: "ship" },
+            { text: "Waves Mode",    action: "startWaves", iconType: "ship" },
+            { text: "Leaderboards",  action: "leaderboards", iconType: "crown" },
         ]
         this.currentIndex = 0
         this.carouselObjects = []
@@ -27,7 +27,7 @@ class CarouselController extends Component {
 
         // Create all carousel items as children of this gameobject
         for (let i = 0; i < this.menuItems.length; i++) {
-            const menuItem = GameObject.instantiate(new CarouselItemGameObject(this.menuItems[i].text, i), {
+            const menuItem = GameObject.instantiate(new CarouselItemGameObject(this.menuItems[i], i), {
                 scene: this.scene,
                 layer: "carouselMid"
             })
@@ -72,7 +72,7 @@ class CarouselController extends Component {
             }
 
             // Either "enter" key selects current card      TODO: Maybe implement mouse detection and click logic??
-            if (Input.keyPressed("Enter") || Input.keyPressed("NumpadEnter")) {
+            if (Input.keyPressed("Enter") || Input.keyPressed("NumpadEnter") || Input.keyPressed("Space")) {
                 this.selectCurrentItem()
             }
         }
@@ -163,6 +163,10 @@ class CarouselController extends Component {
             if (text) {
                 text.hidden = isBackItem    // Hide text if the card is in the "back"
             }
+
+            if (carouselItem.cardBody.iconPoly) {
+                carouselItem.cardBody.iconPoly.hidden = isBackItem
+            }
         }
     }
 
@@ -173,8 +177,11 @@ class CarouselController extends Component {
             case "startGame":
                 SceneManager.loadScene(new GameScene())
                 break
-            case "gameMode2":
-                console.log("Game Mode 2 not implemented yet")
+            case "startPacifism":
+                console.log("Pacifism not implemented yet")
+                break
+            case "startWaves":
+                console.log("Waves not implemented")
                 break
             case "settings":
                 console.log("Settings not implemented yet")
@@ -182,8 +189,7 @@ class CarouselController extends Component {
             case "leaderboards":
                 console.log("Leaderboards not implemented yet")
                 break
-            case "quit":
-                console.log("Quit not implemented")
+            default:
                 break
         }
     }

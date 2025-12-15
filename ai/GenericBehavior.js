@@ -34,7 +34,7 @@ class BTClampInsidePlayableBounds extends BTNode {
     update(tree) {
         const transform = this.controller.transform
         let pos = transform.position
-        const bounds = Config.playable
+        const bounds = Config.Playable
 
         let shapeBounds = setShapeBounds(this.controller)
 
@@ -84,7 +84,7 @@ class BTBounceOffWalls extends BTNode {
     update(tree) {
         const transform = this.controller.transform
         let pos = transform.position
-        const bounds = Config.playable
+        const bounds = Config.Playable
 
         let shapeBounds = setShapeBounds(this.controller)
 

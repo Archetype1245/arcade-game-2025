@@ -2,16 +2,18 @@ class PlayerGameObject extends GameObject {
     constructor() {
         super("PlayerGameObject")
         this.tag = "player"
-        this.size = 20
+        this.size = 10
         this.transform.setScale(this.size)
+        this.transform.rotation = -Math.PI/2
 
         this.addComponent(new PlayerController())
         this.collider = this.addComponent(new PolygonCollider(), {
-            points: [new Vector2(-1, -1), new Vector2(1, -1), new Vector2(1, 1), new Vector2(-1, 1)]
+            points: Config.Shapes.ship.points
         })
         this.addComponent(new Polygon(), {
-            points: [new Vector2(-1, -1), new Vector2(1, -1), new Vector2(1, 1), new Vector2(-1, 1)],
-            fillStyle: Config.colors.player
+            points: Config.Shapes.ship.points,
+            fillStyle: Config.Colors.player
         })
+
     }
 }

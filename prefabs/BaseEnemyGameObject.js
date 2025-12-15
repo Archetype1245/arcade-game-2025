@@ -3,7 +3,8 @@ class BaseEnemyGameObject extends GameObject {
         super("BaseEnemyGameObject")
         this.tag = "enemy"
         this.enemyDef = enemyDef
-        
+
         this.collider = this.addComponent(new PolygonCollider())
+
     }
 }

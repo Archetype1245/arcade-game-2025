@@ -1,14 +1,6 @@
-/**
- * LightBeam - A pure controller component for beam effects.
- * Handles state, animation, and targeting. All rendering is delegated to:
- * - Circle component for the base glow
- * - RenderTarget2D component for the beam body
- * 
- * Color format: { r, g, b, a? } where r,g,b are 0-255 and a is optional 0-1
- */
 class LightBeam extends Component {
 	constructor({
-		color = Config.beamColors.purpleBeam,
+		color = Config.BeamColors.purpleBeam,
 		duration = 1.2,
 		width = 40,
 
@@ -22,6 +14,7 @@ class LightBeam extends Component {
 
 		maxAlpha = 0.85,
 		length = 0,
+        cancelToken = null,
 		onComplete = null,
 	} = {}) {
 		super()
@@ -38,6 +31,7 @@ class LightBeam extends Component {
 			pulseAlpha,
 			maxAlpha,
 			length,
+            cancelToken,
 			onComplete
 		})
 
@@ -51,31 +45,18 @@ class LightBeam extends Component {
 		this._renderTarget = null
 	}
 
-	/**
-	 * Get the base alpha from color, defaulting to 1 if not specified
-	 */
 	get colorAlpha() {
 		return this.color.a ?? 1
 	}
 
-	/**
-	 * Get the effective alpha (animation alpha * color alpha)
-	 */
 	get effectiveAlpha() {
 		return this.alpha * this.colorAlpha
 	}
 
-	/**
-	 * Create rgba string from color object
-	 * @param {number} a - Alpha value 0-1 (will be multiplied by color.a if present)
-	 */
 	rgba(a) {
 		return `rgba(${this.color.r},${this.color.g},${this.color.b},${a * this.colorAlpha})`
 	}
 
-	/**
-	 * Create rgb string from color object
-	 */
 	rgb() {
 		return `rgb(${this.color.r},${this.color.g},${this.color.b})`
 	}
@@ -124,14 +105,18 @@ class LightBeam extends Component {
 				this.t = u
 			},
 			onComplete: () => {
-				this.onComplete?.()
-				this.gameObject.markForDelete = true
+				this._finish(true)
 			}
 		}))
 	}
 
 	update() {
 		if (!this.started) return
+
+        if (this.cancelToken?.cancelled) {
+            this._finish(false)
+            return
+        }
 
 		this._retarget()
 
@@ -151,6 +136,16 @@ class LightBeam extends Component {
 		}
 	}
 
+    _finish(finished) {
+        if (this._done) return
+        this._done = true
+
+        if (this._transition) this._transition.cancel()
+
+        this.onComplete?.(finished)
+        this.gameObject.markForDelete = true
+    }
+
 	_retarget() {
 		this.player ??= GameObject.getObjectByName("PlayerGameObject")
 		if (!this.player) return
@@ -161,9 +156,6 @@ class LightBeam extends Component {
 		this.gameObject.transform.rotation = Math.atan2(dir.y, dir.x)
 	}
 
-	/**
-	 * Creates the radial gradient for the base glow circle
-	 */
 	_createBaseGlowGradient(ctx, radius) {
 		const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius)
 		grad.addColorStop(0.00, this.rgba(0.40))
@@ -173,9 +165,6 @@ class LightBeam extends Component {
 		return grad
 	}
 
-	/**
-	 * Render callback for the beam body (called by RenderTarget2D)
-	 */
 	_renderBeamBody(ctxOS, L, H) {
 		const p = this.t
 
@@ -216,7 +205,6 @@ class LightBeam extends Component {
 			this._drawWhiteCore(ctxOS, L, H)
 		}
 
-		// Y-axis alpha mask (vertical feathering)
 		ctxOS.globalCompositeOperation = "destination-in"
 		ctxOS.globalAlpha = 1
 
@@ -237,14 +225,11 @@ class LightBeam extends Component {
 		ctxOS.fillRect(0, 0, L, H)
 	}
 
-	/**
-	 * Draw the white core effect at beam origin
-	 */
-	_drawWhiteCore(ctxOS, W, H) {
-		const base = 0.8 * H
-		const len = Math.max(1, Math.round(0.2 * W))
+	_drawWhiteCore(ctxOS, w, h) {
+		const base = 0.8 * h
+		const len = Math.max(1, Math.round(0.2 * w))
 		const k = 16
-		const cy = H / 2
+		const cy = h / 2
 		const samples = 80
 
 		const half = x => (base * 0.5) / (1 + k * (x / len) * (x / len))
@@ -273,23 +258,19 @@ class LightBeam extends Component {
 		ctxOS.restore()
 	}
 
-	draw(ctx) {
-		// All rendering delegated to Circle and RenderTarget2D components
-	}
-
 	static triggerBeam(spawnPos, {
 		scene = SceneManager.currentScene,
-		layer = Config.layers.enemies,
+		layer = "effects",
+        cancelToken = null,
 		...opts
 	} = {}) {
 		return new Promise(resolve => {
-			const go = new LightBeamGameObject()
-			GameObject.instantiate(go, {
+			const go = GameObject.instantiate(new GameObject("LightBeamGameObject"), {
 				scene,
 				layer,
 				position: new Vector2(spawnPos.x, spawnPos.y)
 			})
-			go.addComponent(new LightBeam({ ...opts, onComplete: resolve }))
+			go.addComponent(new LightBeam({ ...opts, cancelToken, onComplete: resolve }))
 		})
 	}
 }

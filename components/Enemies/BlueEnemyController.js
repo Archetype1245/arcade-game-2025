@@ -6,11 +6,11 @@ class BlueEnemyController extends Component {
         this.size = 40
         this.transform.setScale(this.size)
 
-        this.speed = Config.speed.blueEnemy
+        this.speed = EnemyDefs.BlueEnemy.speed
         this.dir = Vector2.one
         this.amp = 0.18
         this.period = 2.5
-        this.theta = 2*Math.PI/this.period
+        this.theta = 2 * Math.PI / this.period
         this.t0 = Time.time
 
         this.defs = {
@@ -38,7 +38,7 @@ class BlueEnemyController extends Component {
         // Top half
         this.topFrontPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.top, this.defs.fL, this.defs.fR],
-            fillStyle: Config.colors.lightblueHi,
+            fillStyle: Config.Colors.lightblueHi,
         })
         // this.topRightPoly = this.gameObject.addComponent(new Polygon(), {
         //     points: [this.defs.top, this.defs.fR, this.defs.bR],
@@ -58,11 +58,11 @@ class BlueEnemyController extends Component {
                 [this.defs.top, this.defs.fR, this.defs.bR],
                 [this.defs.bot, this.defs.fL, this.defs.fR]
             ],
-            fillStyle: Config.colors.lightblueM,
+            fillStyle: Config.Colors.lightblueM,
         })
         this.bottomRightPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.bot, this.defs.fR, this.defs.bR],
-            fillStyle: Config.colors.lightblueLow,
+            fillStyle: Config.Colors.lightblueLow,
         })
         // Merged all lines/strokes into two polys to minimize stroke calls
         this.backLines = this.gameObject.addComponent(new Polygon(), {
@@ -70,7 +70,7 @@ class BlueEnemyController extends Component {
                 [this.defs.top, this.defs.bL, this.defs.bot],
                 [this.defs.fL, this.defs.bL, this.defs.bR]
             ],
-            strokeStyle: Config.colors.lightblueLinesBack,
+            strokeStyle: Config.Colors.lightblueLinesBack,
             closePath: false,
             fill: false,
             lineWidth: 1
@@ -80,14 +80,14 @@ class BlueEnemyController extends Component {
                 [this.defs.top, this.defs.fL, this.defs.bot, this.defs.bR, this.defs.top, this.defs.fR, this.defs.bot],
                 [this.defs.fL, this.defs.fR, this.defs.bR]
             ],
-            strokeStyle: Config.colors.lightblueLinesFront,
+            strokeStyle: Config.Colors.lightblueLinesFront,
             closePath: false,
             fill: false,
             lineWidth: 1
         })
 
         this.polys = [this.gameObject.collider, this.topFrontPoly, /*this.topRightPoly, this.bottomFrontPoly,*/
-                      this.midShadePolys, this.bottomRightPoly, this.frontLines, this.backLines]
+        this.midShadePolys, this.bottomRightPoly, this.frontLines, this.backLines]
 
         // Define shape bounds for generic clamping
         this.shapeBounds = {
@@ -96,15 +96,20 @@ class BlueEnemyController extends Component {
             left: this.defs.fL.x * this.size,
             right: this.defs.bR.x * this.size
         }
+
+        this.gameObject.addComponent(new SeparationController(), {
+            radius: this.size * 0.5,
+            maxPush: this.size * 0.5,
+        })
     }
 
-    update() {
+    update(dt) {
         // Sinusoidal function to cycle between +- amplitude. Subtracting t0 to make an individual GO's cycle start on spawn and not be global
         const s = this.amp * Math.sin(this.theta * (Time.time - this.t0))
         const su = 1 + s
         const sv = 1 / su
         this.deform.setScaleUV(su, sv)
-        
+
         this.polys.forEach(p => p.markDirty())
     }
 }

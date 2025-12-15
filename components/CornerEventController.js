@@ -15,10 +15,6 @@ class CornerEventController extends Component {
         this.spawnsDone = 0
     }
 
-    start() {
-        console.log(this.corners)
-    }
-
     update(dt) {
         if (this.spawnsDone >= this.totalToSpawn) {
             this.gameObject.destroy()

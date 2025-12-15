@@ -1,4 +1,4 @@
-const b = Config.playable
+const b = Config.Playable
 const inset = 30
 const corners = [
     new Vector2(b.x1 + inset, b.y1 + inset),
@@ -39,7 +39,7 @@ const EventDefs = {
 
         params: {
             enemyId: "GreenEnemy",
-            perCorner: 15,
+            perCorner: 12,
             duration: 6,
             corners: corners,
         },
@@ -49,7 +49,7 @@ const EventDefs = {
         id: "pink_corner_rain",
         cost: 50,
         cooldown: 18,
-        weight: 1,
+        weight: 0.5,
         minIntensity: 50,
         minScore: 7000,
         duration: 5,
@@ -57,7 +57,7 @@ const EventDefs = {
 
         params: {
             enemyId: "PinkEnemy",
-            perCorner: 15,
+            perCorner: 6,
             duration: 6,
             corners: corners,
         },
@@ -96,7 +96,7 @@ const EventDefs = {
             enemyId: "GreenEnemy",
             center: { x: 900, y: 600 },
             radius: 400,
-            count: 24,
+            count: 20,
         },
     },
 
@@ -114,7 +114,7 @@ const EventDefs = {
             enemyId: "PinkEnemy",
             center: { x: 900, y: 600 },
             radius: 400,
-            count: 30,
+            count: 20,
         },
     },
 }

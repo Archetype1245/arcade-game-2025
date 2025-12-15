@@ -29,7 +29,7 @@ function buildGreenEnemyBT(controller) {
     // Run both dodge movement and positional clamping
     // Parallel so the clamping happens every frame, rather than only once after the dodge finishes
     const dodgeMovementParallel = new BTParallel()
-    dodgeMovementParallel.addChild(new BTPerformDodgeMovement(controller))
+    dodgeMovementParallel.addChild(new BTPerformDodgeMovement(controller))        // Dodge cooldown currently set to 0
     dodgeMovementParallel.addChild(new BTClampInsidePlayableBounds(controller))
     
     const dodgeSequence = new BTSequence()

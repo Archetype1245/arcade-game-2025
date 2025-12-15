@@ -2,6 +2,7 @@ class BlueEnemyGameObject extends BaseEnemyGameObject {
     constructor(enemyDef) {
         super(enemyDef)
         this.name = "BlueEnemyGameObject"
+        this.subType = "blue"
         
         const controller = this.addComponent(new BlueEnemyController())
         

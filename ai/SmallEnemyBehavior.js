@@ -41,7 +41,7 @@ class BTClampOrbitInsidePlayableBounds extends BTNode {
     }
 
     update(tree) {
-        const bounds = Config.playable
+        const bounds = Config.Playable
         const orbitCenter = this.controller.orbitCenterPos
         const orbitRadius = this.controller.currentOrbitRadius
         const enemyRadius = this.controller.radius

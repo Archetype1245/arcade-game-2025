@@ -2,32 +2,65 @@ class SpawnController extends Component {
     constructor() {
         super()
 
-        // Initial values currently tuned for testing various things - TODO: adjust for normal gameplay when done
-        this.intensity = 500
+        // TODO: adjust for better feeling gameplay
+        this.intensity = IntensityConfig.START_INTENSITY
 
-        this.timeSinceEnemySpawn = IntensityConfig.spawnIntervalMax
+        this.timeSinceEnemySpawn = IntensityConfig.SPAWN_INTERVAL_MAX
         this.timeSinceEventCheck = 8
 
         this.eventCooldowns = {}
         for (const eventId in EventDefs) {
             this.eventCooldowns[eventId] = 0
         }
+
+        this._paused = false
+        this._spawnToken = new CancelToken()
     }
 
     start() {
+        Events.addEventListener("PlayerDeath", this)
+
         this.player = GameObject.getObjectByName("PlayerGameObject")
         this.screenDiag = Math.hypot(Engine.canvas.width / 2, Engine.canvas.height / 2)
 
         // Listen for enemy deaths to handle pink enemy splits
-        Events.addEventListener("EnemyDeath", (data) => {
-            if (data.enemyDef.type === Config.enemyTypes.pink) {
-                this.handlePinkEnemySplit(data)
+        Events.addEventListener("EnemyKilled", (data) => {
+            if (data.enemyDef.deathSpawns) {
+                this._handleDeathSpawns(data)
             }
         })
     }
 
+    handleEvent(signal, event) {
+        if (signal !== "PlayerDeath") return
+
+        this.pauseSpawning()
+
+        setTimeout(() => {
+            this.resumeSpawning()
+        }, 5000)
+    }
+
+    pauseSpawning({ resetVals = true } = {}) {
+        this._paused = true
+        this._spawnToken.cancel()
+        this._spawnToken = new CancelToken()
+
+        if (resetVals) {
+            this.timeSinceEnemySpawn = IntensityConfig.SPAWN_INTERVAL_MAX
+            this.timeSinceEventCheck = 0
+            this.intensity = IntensityConfig.START_INTENSITY
+        }
+    }
+
+    resumeSpawning() {
+        this._paused = false
+    }
+
     update(dt) {
-        this.updateIntensity(dt);
+        if (this._paused) return
+
+        this.updateIntensity(dt)
 
         this.timeSinceEnemySpawn += dt
         this.timeSinceEventCheck += dt
@@ -40,7 +73,7 @@ class SpawnController extends Component {
             }
         }
 
-        if (this.timeSinceEventCheck >= IntensityConfig.eventCheckInterval) {
+        if (this.timeSinceEventCheck >= IntensityConfig.EVENT_CHECK_INTERVAL) {
             // const event = EventDefs.blue_corner_rain
             // const event = EventDefs.blue_ring_burst
             // EventScriptRunner.runScript(event.scriptId, this, event)
@@ -58,49 +91,54 @@ class SpawnController extends Component {
     updateIntensity(dt) {
         const currentScore = GameGlobals.score || 0
 
-        const baseGain = IntensityConfig.baseGainPerSecond * dt
+        const baseGain = IntensityConfig.BASE_GAIN_PER_SECOND * dt
         const scoreGain = currentScore > 0 ? Math.pow(Math.log10(currentScore), 2) * dt : 0
 
         this.intensity += Math.max(baseGain, scoreGain)
-        this.intensity = Math.min(this.intensity, IntensityConfig.maxIntensity)
+        this.intensity = Math.min(this.intensity, IntensityConfig.MAX_INTENSITY)
     }
 
     getCurrentSpawnInterval() {
-        const t = Math.min(1, this.intensity / IntensityConfig.spawnIntervalScaleIntensity)
-        return IntensityConfig.spawnIntervalMax -
-            (IntensityConfig.spawnIntervalMax - IntensityConfig.spawnIntervalMin) * t
+        const t = Math.min(1, this.intensity / IntensityConfig.SPAWN_INTERVAL_SCALE_INTENSITY)
+        return IntensityConfig.SPAWN_INTERVAL_MAX -
+            (IntensityConfig.SPAWN_INTERVAL_MAX - IntensityConfig.SPAWN_INTERVAL_MIN) * t
     }
 
     getSpawnsPerTick() {
         const t = Math.min(1, this.intensity / 100)
-        const range = IntensityConfig.maxSpawnsPerTick - IntensityConfig.minSpawnsPerTick
-        return Math.floor(IntensityConfig.minSpawnsPerTick + range * t)
+        const range = IntensityConfig.MAX_SPAWNS_PER_TICK - IntensityConfig.MIN_SPAWNS_PER_TICK
+        return Math.floor(IntensityConfig.MIN_SPAWNS_PER_TICK + range * t)
     }
 
     async spawn(enemy, pos) {
+        if (this._paused) return
+
         if (enemy.beamColor) {
-            await LightBeam.triggerBeam(pos, {
+            const spawnOK = await LightBeam.triggerBeam(pos, {
                 color: enemy.beamColor,
-                length: this.screenDiag
+                length: this.screenDiag,
+                cancelToken: this._spawnToken
             })
+
+            if (!spawnOK || this._paused) return
         }
 
         // Create the appropriate enemy prefab based on type
         let enemyGameObject
         switch (enemy.type) {
-            case Config.enemyTypes.purple:
+            case Config.EnemyTypes.purple:
                 enemyGameObject = new PurpleEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.blue:
+            case Config.EnemyTypes.blue:
                 enemyGameObject = new BlueEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.green:
+            case Config.EnemyTypes.green:
                 enemyGameObject = new GreenEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.pink:
+            case Config.EnemyTypes.pink:
                 enemyGameObject = new PinkEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.small:
+            case Config.EnemyTypes.small:
                 enemyGameObject = new SmallEnemyGameObject(enemy)
                 break
             default:
@@ -110,7 +148,7 @@ class SpawnController extends Component {
 
         GameObject.instantiate(enemyGameObject, {
             scene: SceneManager.currentScene,
-            layer: Config.layers.enemies,
+            layer: "enemies",
             position: pos
         })
     }
@@ -156,7 +194,7 @@ class SpawnController extends Component {
     }
 
     checkAndSpawnEvent() {
-        if (this.intensity < IntensityConfig.minIntensityForEvents) {
+        if (this.intensity < IntensityConfig.MIN_INTENSITY_FOR_EVENTS) {
             return
         }
 
@@ -207,10 +245,10 @@ class SpawnController extends Component {
         return items[items.length - 1]
     }
 
-    handlePinkEnemySplit(deathData) {
-        const { pos, shotAngle } = deathData
+    _handleDeathSpawns(data) {
+        const { pos, shotAngle, enemyDef } = data
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < enemyDef.deathSpawns.count; i++) {
             // Random angle within (+-)π/2 of laser angle helps ensure player safety on enemy spawn
             const angleOffset = (Math.random() - 0.5) * Math.PI
             const spawnAngle = shotAngle + angleOffset
@@ -221,13 +259,7 @@ class SpawnController extends Component {
             const y = pos.y + Math.sin(spawnAngle) * distance
             const spawnPos = this.ensureValidSpawnPosition(x, y)
 
-            this.spawn(EnemyDefs.SmallEnemy, spawnPos)
-
-            // GameObject.instantiate(new SmallEnemyGameObject(EnemyDefs.SmallEnemy), {
-            //     scene: SceneManager.currentScene,
-            //     layer: Config.layers.enemies,
-            //     position: spawnPos
-            // })
+            this.spawn(EnemyDefs[enemyDef.deathSpawns.type], spawnPos)  
         }
     }
 
@@ -247,7 +279,7 @@ class SpawnController extends Component {
     }
 
     ensureValidSpawnPosition(x, y) {
-        const b = Config.playable
+        const b = Config.Playable
         const inset = 25
 
         x = Math.min(Math.max(x, b.x1 + inset), b.x2 - inset)

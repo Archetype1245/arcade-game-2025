@@ -42,25 +42,28 @@ class BackgroundDotController extends Component {
     update(dt) {
         const p = this.transform.position
         const padding = this.config.SCREEN_PADDING
-        const canvas = Engine.canvas
+        
+        // Get design-space bounds from network controller
+        const designWidth = this.networkController.designWidth
+        const designHeight = this.networkController.designHeight
 
         p.x += this.velocity.x * dt
         p.y += this.velocity.y * dt
 
-        // Dots bounce off edges
+        // Dots bounce off design-space edges
         if (p.x < -padding) {
             p.x = -padding
             this.velocity.x *= -1
-        } else if (p.x > canvas.width + padding) {
-            p.x = canvas.width + padding
+        } else if (p.x > designWidth + padding) {
+            p.x = designWidth + padding
             this.velocity.x *= -1
         }
 
         if (p.y < -padding) {
             p.y = -padding
             this.velocity.y *= -1
-        } else if (p.y > canvas.height + padding) {
-            p.y = canvas.height + padding
+        } else if (p.y > designHeight + padding) {
+            p.y = designHeight + padding
             this.velocity.y *= -1
         }
         this.transform.position = p

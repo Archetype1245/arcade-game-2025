@@ -15,7 +15,7 @@ class SmallEnemyController extends Component {
         this.orbitSpeed = 7.5 // radians per second
         this.orbitAngle = Math.random() * Math.PI * 2
         
-        this.speed = this.gameObject.enemyDef.speed
+        this.speed = EnemyDefs.SmallEnemy.speed
         
         this.defs = {
             left: new Vector2(-1, 0), right: new Vector2(1, 0),
@@ -28,7 +28,7 @@ class SmallEnemyController extends Component {
         
         this.topLeftPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.top, this.defs.left, this.defs.tM],
-            fillStyle: Config.colors.pinkHi,
+            fillStyle: Config.Colors.pinkHi,
         })
         
         this.midShadePolys = this.gameObject.addComponent(new Polygon(), {
@@ -36,12 +36,12 @@ class SmallEnemyController extends Component {
                 [this.defs.top, this.defs.tM, this.defs.right],
                 [this.defs.bot, this.defs.tM, this.defs.left]
             ],
-            fillStyle: Config.colors.pinkBase,
+            fillStyle: Config.Colors.pinkBase,
         })
         
         this.bottomRightPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.bot, this.defs.right, this.defs.tM],
-            fillStyle: Config.colors.pinkLow,
+            fillStyle: Config.Colors.pinkLow,
         })
         
         this.lowerLines = this.gameObject.addComponent(new Polygon(), {
@@ -49,7 +49,7 @@ class SmallEnemyController extends Component {
                 [this.defs.left, this.defs.bM, this.defs.right],
                 [this.defs.bot, this.defs.bM, this.defs.top]
             ],
-            strokeStyle: Config.colors.pinkBottomLines,
+            strokeStyle: Config.Colors.pinkBottomLines,
             closePath: false,
             fill: false,
             lineWidth: 1
@@ -61,7 +61,7 @@ class SmallEnemyController extends Component {
                 [this.defs.bot, this.defs.tM, this.defs.top],
                 [this.defs.left, this.defs.tM, this.defs.right]
             ],
-            strokeStyle: Config.colors.pinkUpperLines,
+            strokeStyle: Config.Colors.pinkUpperLines,
             closePath: false,
             fill: false,
             lineWidth: 1

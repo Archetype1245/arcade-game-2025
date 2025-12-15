@@ -2,8 +2,8 @@ class PlayableAreaGameObject extends GameObject {
     constructor() {
         super("PlayableAreaGameObject")
 
-        const w = Config.playable.w
-        const h = Config.playable.h
+        const w = Config.Playable.w
+        const h = Config.Playable.h
         const cx = w / 2
         const cy = h / 2
         this.transform.position = { x: cx, y: cy }
@@ -17,7 +17,7 @@ class PlayableAreaGameObject extends GameObject {
         this.addComponent(new Polygon(), {
             points: points,
             fill: true,
-            fillStyle: Config.colors.arenaBackground,
+            fillStyle: Config.Colors.arenaBackground,
             lineWidth: 6,
             strokeStyle: "black"
         })

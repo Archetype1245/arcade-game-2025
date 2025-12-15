@@ -1,15 +1,16 @@
 const IntensityConfig = {
-    baseGainPerSecond: 2.0, 
-    logScoreMultiplier: 1.5,
-    maxIntensity: 150,      
+    BASE_GAIN_PER_SECOND: 2.0, 
+    LOG_SCORE_MULT: 1.5,
+    MAX_INTENSITY: 150,   
+    START_INTENSITY: 10,   
 
-    spawnIntervalMax: 4.0,
-    spawnIntervalMin: 1.0,
-    spawnIntervalScaleIntensity: 100, 
+    SPAWN_INTERVAL_MAX: 4.0,
+    SPAWN_INTERVAL_MIN: 1.0,
+    SPAWN_INTERVAL_SCALE_INTENSITY: 100, 
 
-    minSpawnsPerTick: 3,
-    maxSpawnsPerTick: 8,
+    MIN_SPAWNS_PER_TICK: 3,
+    MAX_SPAWNS_PER_TICK: 8,
 
-    eventCheckInterval: 10.0,
-    minIntensityForEvents: 40,
+    EVENT_CHECK_INTERVAL: 10.0,
+    MIN_INTENSITY_FOR_EVENTS: 40,
 }

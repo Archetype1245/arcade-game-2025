@@ -21,7 +21,7 @@ class PinkEnemyController extends Component {
 
         this.topLeftPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.top, this.defs.left, this.defs.tM],
-            fillStyle: Config.colors.pinkHi,
+            fillStyle: Config.Colors.pinkHi,
         })
 
         this.midShadePolys = this.gameObject.addComponent(new Polygon(), {
@@ -29,21 +29,21 @@ class PinkEnemyController extends Component {
                 [this.defs.top, this.defs.tM, this.defs.right],
                 [this.defs.bot, this.defs.tM, this.defs.left]
             ],
-            fillStyle: Config.colors.pinkBase,
+            fillStyle: Config.Colors.pinkBase,
         })
 
         this.bottomRightPoly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.bot, this.defs.right, this.defs.tM],
-            fillStyle: Config.colors.pinkLow,
+            fillStyle: Config.Colors.pinkLow,
         })
         this.lowerLines = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.defs.left, this.defs.bM, this.defs.right],
                 [this.defs.bot, this.defs.bM, this.defs.top]
             ],
-            strokeStyle: Config.colors.pinkBottomLines,
+            strokeStyle: Config.Colors.pinkBottomLines,
             closePath: false,
-            fill:false,
+            fill: false,
             lineWidth: 1
         })
         this.upperLines = this.gameObject.addComponent(new Polygon(), {
@@ -52,26 +52,33 @@ class PinkEnemyController extends Component {
                 [this.defs.bot, this.defs.tM, this.defs.top],
                 [this.defs.left, this.defs.tM, this.defs.right]
             ],
-            strokeStyle: Config.colors.pinkUpperLines,
+            strokeStyle: Config.Colors.pinkUpperLines,
             closePath: false,
             fill: false,
             lineWidth: 1
         })
 
-        this.polys = [this.gameObject.collider, this.lowerLines, this.upperLines, this.midShadePolys,
-                      this.topLeftPoly, /*this.topRightPoly, this.bottomLeftPoly*/, this.bottomRightPoly]
+        this.gameObject.addComponent(new SeparationController(), {
+            radius: this.size * 0.5,
+            maxPush: this.size * 0.5,
+        })
+
+        this.polys = [
+            this.gameObject.collider, this.lowerLines, this.upperLines, this.midShadePolys,
+            this.topLeftPoly, /*this.topRightPoly, this.bottomLeftPoly*/, this.bottomRightPoly
+        ]
     }
 
     update() {
         const p = this.player.transform.position
         const t = this.transform.position
-        
+
         const dir = p.getDirectionVector(t)
         const r = Math.atan2(dir.y, dir.x)  // Angle to make the enemy "face" the player
-        
+
         const wobble = (Math.PI / 6) * (Math.sin((2 * Math.PI / this.period) * Time.time))  // Oscillation between +- 30 degrees
         this.transform.setRotation(r + wobble)  // Enemy turns to "face" the player but always has the oscillation
-        
+
         this.polys.forEach(p => p.markDirty())
     }
 }

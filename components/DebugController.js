@@ -32,16 +32,16 @@ class DebugController extends Component {
         let enemyGameObject
 
         switch (enemy.type) {
-            case Config.enemyTypes.purple:
+            case Config.EnemyTypes.purple:
                 enemyGameObject = new PurpleEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.blue:
+            case Config.EnemyTypes.blue:
                 enemyGameObject = new BlueEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.pink:
+            case Config.EnemyTypes.pink:
                 enemyGameObject = new PinkEnemyGameObject(enemy)
                 break
-            case Config.enemyTypes.green:
+            case Config.EnemyTypes.green:
                 enemyGameObject = new GreenEnemyGameObject(enemy)
                 break
             default:
@@ -56,7 +56,7 @@ class DebugController extends Component {
 
         GameObject.instantiate(enemyGameObject, {
             scene: SceneManager.currentScene,
-            layer: Config.layers.enemies,
+            layer: Config.Layers.enemies,
             position: pos
         })
     }

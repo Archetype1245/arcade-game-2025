@@ -7,7 +7,7 @@ class GreenEnemyController extends Component {
         this.transform.setScale(this.size)
 
         this.rotationSpeed = 0.5
-        this.speed = Config.speed.greenEnemy
+        this.speed = EnemyDefs.GreenEnemy.speed
 
         this.outer = {
             tL: new Vector2(-1, -1), tR: new Vector2(1, -1),
@@ -44,31 +44,31 @@ class GreenEnemyController extends Component {
                 [this.outer.bR, this.inner.bR, this.inner.tR],
                 [this.outer.tR, this.inner.tR, this.inner.tL]
             ],
-            fillStyle: Config.colors.greenBase
+            fillStyle: Config.Colors.greenBase
         })
         this.upperLeft = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.inner.tL, this.inner.tM, this.inner.tR],
                 [this.inner.bL, this.inner.tM, this.inner.tL],
             ],
-            fillStyle: Config.colors.greenHi
+            fillStyle: Config.Colors.greenHi
         })
         this.upperRight = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.inner.bL, this.inner.tM, this.inner.bR],
                 [this.inner.bR, this.inner.tM, this.inner.tR],
             ],
-            fillStyle: Config.colors.greenLow
+            fillStyle: Config.Colors.greenLow
         })
         this.upperLines = this.gameObject.addComponent(new Polygon(), {
             points: [
                 [this.outer.tL, this.inner.bL, this.outer.bL, this.inner.bR,
-                 this.outer.bR, this.inner.tR, this.outer.tR, this.inner.tL,
-                 this.inner.bL, this.inner.bR, this.inner.tR, this.inner.tL],
+                this.outer.bR, this.inner.tR, this.outer.tR, this.inner.tL,
+                this.inner.bL, this.inner.bR, this.inner.tR, this.inner.tL],
                 [this.inner.tL, this.inner.tM, this.inner.bR],
                 [this.inner.bL, this.inner.tM, this.inner.tR]
             ],
-            strokeStyle: Config.colors.greenUpperLines,
+            strokeStyle: Config.Colors.greenUpperLines,
             fill: false,
             closePath: false,
             lineWidth: 1
@@ -78,10 +78,15 @@ class GreenEnemyController extends Component {
                 [this.inner.tL, this.inner.bM, this.inner.bR],
                 [this.inner.bL, this.inner.bM, this.inner.tR]
             ],
-            strokeStyle: Config.colors.greenBottomLines,
+            strokeStyle: Config.Colors.greenBottomLines,
             fill: false,
             closePath: false,
             lineWidth: 1
+        })
+
+        this.gameObject.addComponent(new SeparationController(), {
+            radius: this.size * 0.5,
+            maxPush: this.size * 0.5,
         })
 
         this.polys = [this.gameObject.collider, this.outerTris, this.upperLeft, this.upperRight, this.upperLines, this.lowerLines]

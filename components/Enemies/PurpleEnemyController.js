@@ -4,7 +4,7 @@ class PurpleEnemyController extends Component {
         this.radius = Math.hypot(this.size, this.size)
         this.transform.setScale(this.size)
 
-        this.speed = Config.speed.purpleEnemy
+        this.speed = EnemyDefs.PurpleEnemy.speed
         this.rotationSpeed = -1.25
         const a = Math.random() * 2 * Math.PI
         this.dir = (new Vector2(Math.cos(a), Math.sin(a))).normalize()   // Assign a random direction to move
@@ -21,8 +21,8 @@ class PurpleEnemyController extends Component {
         this.poly = this.gameObject.addComponent(new Polygon(), {
             points: [this.defs.mM, this.defs.tM, this.defs.tL, this.defs.bR, this.defs.bM,
             this.defs.mM, this.defs.mL, this.defs.bL, this.defs.tR, this.defs.mR],
-            fillStyle: Config.colors.purpleFill,
-            strokeStyle: Config.colors.purpleLine,
+            fillStyle: Config.Colors.purpleFill,
+            strokeStyle: Config.Colors.purpleLine,
             lineWidth: 1
         })
         this.polys = [this.gameObject.collider, this.poly]
